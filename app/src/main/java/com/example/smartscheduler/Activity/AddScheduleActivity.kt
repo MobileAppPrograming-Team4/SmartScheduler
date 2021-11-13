@@ -7,6 +7,7 @@ import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.smartscheduler.*
+import com.example.smartscheduler.Database.ScheduleInfo
 import java.util.*
 
 class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.CompleteListener {

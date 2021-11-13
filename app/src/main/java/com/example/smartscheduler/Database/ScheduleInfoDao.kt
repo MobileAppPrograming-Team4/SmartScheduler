@@ -1,8 +1,8 @@
-package com.example.smartscheduler
+package com.example.smartscheduler.Database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import kotlinx.coroutines.flow.Flow
+import com.example.smartscheduler.Database.ScheduleInfo
 
 
 @Dao //Room에서는 SQL을 이용한 직접적인 쿼리 접근 대신에 DAO(Data Access Object)를 이용하여 데이터베이스에 접근해야합니다.

@@ -1,4 +1,4 @@
-package com.example.smartscheduler
+package com.example.smartscheduler.Database
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo

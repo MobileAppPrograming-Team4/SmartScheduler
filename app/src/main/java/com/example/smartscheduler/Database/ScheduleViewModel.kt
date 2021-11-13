@@ -1,4 +1,4 @@
-package com.example.smartscheduler
+package com.example.smartscheduler.Database
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -6,7 +6,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import java.util.*
-import android.util.Log
+import com.example.smartscheduler.Database.ScheduleDatabase
+import com.example.smartscheduler.Database.ScheduleInfo
+import com.example.smartscheduler.Database.ScheduleRepository
 import kotlin.properties.Delegates
 
 class ScheduleViewModel(application: Application) : AndroidViewModel(application) {
@@ -23,7 +25,7 @@ class ScheduleViewModel(application: Application) : AndroidViewModel(application
     })
 
     val scheduleInfoDao = ScheduleDatabase.getDatabase(application).scheduleInfoDao()
-    private val repository:ScheduleRepository = ScheduleRepository(scheduleInfoDao)
+    private val repository: ScheduleRepository = ScheduleRepository(scheduleInfoDao)
 
     fun insert(scheduleInfo: ScheduleInfo) = viewModelScope.launch {
         repository.insert(scheduleInfo)

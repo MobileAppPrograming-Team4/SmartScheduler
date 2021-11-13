@@ -10,11 +10,12 @@ import android.view.Window
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.smartscheduler.*
+import com.example.smartscheduler.Database.ScheduleInfo
+import com.example.smartscheduler.Database.ScheduleViewModel
 import com.example.smartscheduler.Decorator.SaturdayDecorator
 import com.example.smartscheduler.Decorator.SundayDecorator
 import com.example.smartscheduler.Decorator.TodayDecorator

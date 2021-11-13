@@ -1,7 +1,9 @@
-package com.example.smartscheduler
+package com.example.smartscheduler.Database
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
+import com.example.smartscheduler.Database.ScheduleInfo
+import com.example.smartscheduler.Database.ScheduleInfoDao
 
 
 class ScheduleRepository(private val scheduleInfoDao: ScheduleInfoDao) {

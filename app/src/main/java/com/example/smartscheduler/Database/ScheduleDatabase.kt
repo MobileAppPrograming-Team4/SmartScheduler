@@ -1,19 +1,14 @@
-package com.example.smartscheduler
+package com.example.smartscheduler.Database
 
 import android.content.Context
 import androidx.room.Database
-import androidx.room.DatabaseConfiguration
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
-import androidx.sqlite.db.SupportSQLiteOpenHelper
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @Database(entities = arrayOf(ScheduleInfo::class), version = 1)
 abstract class ScheduleDatabase : RoomDatabase() {
     //데이터베이스를 매번 생성하는건 리소스를 많이 사용하므로 싱글톤 권장
-    abstract fun scheduleInfoDao():ScheduleInfoDao
+    abstract fun scheduleInfoDao(): ScheduleInfoDao
 
 
     companion object{
@@ -22,7 +17,7 @@ abstract class ScheduleDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: ScheduleDatabase? = null
 
-        fun getDatabase(context:Context):ScheduleDatabase{
+        fun getDatabase(context:Context): ScheduleDatabase {
             /* 데이터베이스를 만들어 Room의 데이터베이스 빌더를 사용하여 ScheduleDatabase 클래스의 애플리케이션 컨텍스트에서
              * ScheduleDatabase 객체를 만들고 이름을 "schedule_database"로 지정 */
             return INSTANCE ?: synchronized(this){
