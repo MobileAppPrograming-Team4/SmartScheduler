@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/drawable/ic_baseline_crop_din_24.xml" value="0.215625" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/drawable/radius.xml" value="0.1" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/drawable/selector_radio_text.xml" value="0.11851851851851852" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_addschedule.xml" value="0.18931159420289856" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_calendar.xml" value="0.19947916666666668" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_main.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_userinfo.xml" value="0.19947916666666668" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/bottom_setschedule.xml" value="0.1" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/fragment_bottomsetschedule.xml" value="0.18342391304347827" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/item_schedule.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/recyclerview_schedules.xml" value="0.4466666666666667" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
