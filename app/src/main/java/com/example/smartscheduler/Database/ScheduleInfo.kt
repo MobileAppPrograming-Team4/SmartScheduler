@@ -6,7 +6,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.io.Serializable
 
-@Entity(tableName = "schedule_database", /*primaryKeys = arrayOf("schedule_explain","schedule_start_year","schedule_start_month","schedule_start_day","schedule_start_hour","schedule_start_minute")*/)
+@Entity(tableName = "schedule_database")
 data class ScheduleInfo(
     @PrimaryKey(autoGenerate = true) var sId:Int = 0,// autoGenerate = true , 자동으로 PrimaryKey 생성해줌
     @ColumnInfo(name = "schedule_explain") var scheduleExplain: String, // 일정 내용

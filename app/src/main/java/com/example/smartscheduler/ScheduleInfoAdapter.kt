@@ -2,12 +2,14 @@ package com.example.smartscheduler
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.PorterDuff
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.smartscheduler.Database.ScheduleInfo
 
@@ -15,8 +17,11 @@ import com.example.smartscheduler.Database.ScheduleInfo
 class ScheduleInfoAdapter(context: Context) :
     RecyclerView.Adapter<ScheduleInfoAdapter.ViewHolder>() {
 
-    private val inflater:LayoutInflater = LayoutInflater.from(context)
+    private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var scheduleList = emptyList<ScheduleInfo>()
+    private var alarmOnColor =
+        ContextCompat.getColor(context, R.color.design_default_color_secondary)
+
     /**
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder).
@@ -26,8 +31,8 @@ class ScheduleInfoAdapter(context: Context) :
         var startHour: TextView
         var gubun: TextView //" : "
         var startMinute: TextView
-        var alarmOn:ImageView
-        var scheduleExplain:TextView
+        var alarmOn: ImageView
+        var scheduleExplain: TextView
 
 
         init {
@@ -55,6 +60,11 @@ class ScheduleInfoAdapter(context: Context) :
         // contents of the view with that element
         val schedule = scheduleList[position]
         viewHolder.startHour.text = schedule.scheduleStartHour.toString()
+        if (schedule.setAlarm) {
+            viewHolder.alarmOn.setColorFilter(alarmOnColor, PorterDuff.Mode.SRC_IN)
+        } else {
+            viewHolder.alarmOn.setColorFilter(null)
+        }
         viewHolder.gubun.text = " : "
         viewHolder.startMinute.text = schedule.scheduleStartMinute.toString()
         viewHolder.scheduleExplain.text = schedule.scheduleExplain
@@ -64,7 +74,7 @@ class ScheduleInfoAdapter(context: Context) :
     override fun getItemCount() = scheduleList.size
 
     @SuppressLint("NotifyDataSetChanged")
-    internal fun setData(scheduleInfo: List<ScheduleInfo>){
+    internal fun setData(scheduleInfo: List<ScheduleInfo>) {
         this.scheduleList = scheduleInfo
         notifyDataSetChanged()
     }

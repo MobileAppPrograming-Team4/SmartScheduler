@@ -24,24 +24,23 @@ import com.prolificinteractive.materialcalendarview.CalendarMode
 import java.util.*
 
 
-
-
 class MainActivity : AppCompatActivity() {
     lateinit var selectedDateTextView: TextView
     private lateinit var addSchedule: Button
     private lateinit var calendarView: com.prolificinteractive.materialcalendarview.MaterialCalendarView
-    var selectedYear:Int? = null
-    var selectedMonth:Int? = null
-    var selectedDate:Int? = null
+    var selectedYear: Int? = null
+    var selectedMonth: Int? = null
+    var selectedDate: Int? = null
     private var doubleBackToExit = false
-    private lateinit var adapter:ScheduleInfoAdapter
+    private lateinit var adapter: ScheduleInfoAdapter
     private lateinit var scheduleViewModel: ScheduleViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.activity_main)
-        val recyclerView = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recyclerView)
+        val recyclerView =
+            findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recyclerView)
         adapter = ScheduleInfoAdapter(this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -69,18 +68,16 @@ class MainActivity : AppCompatActivity() {
         scheduleViewModel = ViewModelProvider(this).get(ScheduleViewModel::class.java)
 
         scheduleViewModel.getAllDate().observe(this, Observer { scheduleList ->
-            scheduleList?.let{adapter.setData(it)}
+            scheduleList?.let { adapter.setData(it) }
         })
-        /*scheduleViewModel.allSchedule.observe(this, Observer{ scheduleList ->
-            scheduleList?.let{ adapter.setData(it) }
-        })*/
 
 
         initCalendarView() //달력 설정
 
-        try{
+        try {
             /* 일정 설정 화면에서 작성한 일정 정보들 받아오기 */
-            val newSchedule: ScheduleInfo = getIntent()?.getSerializableExtra("newSchedule") as ScheduleInfo
+            val newSchedule: ScheduleInfo =
+                getIntent()?.getSerializableExtra("newSchedule") as ScheduleInfo
             Log.d(
                 "MainActivity",
                 "${newSchedule.scheduleExplain}, ${newSchedule.scheduleStartYear}, ${newSchedule.scheduleStartMonth}, ${newSchedule.scheduleStartDay}, ${newSchedule.scheduleStartHour}:${newSchedule.scheduleStartMinute},${newSchedule.transportation},${newSchedule.setAlarm}"
@@ -88,11 +85,8 @@ class MainActivity : AppCompatActivity() {
             /* insert newSchedule into schedule_database */
             scheduleViewModel.insert(newSchedule)
 
-        }catch(e:NullPointerException){
+        } catch (e: NullPointerException) {
         }
-
-
-        /* schedule info recyclerView */
 
 
         /* 일정 추가하기 버튼 클릭*/
@@ -112,56 +106,27 @@ class MainActivity : AppCompatActivity() {
         *  1.5초이내 재 클릭시에는 true로 인해 액티비티가 종료
         *  1.5초 이후에는 Handler에 의해 다시 false로 변경되어 다시 토스트 메시지가 나타납니다
         * */
-        if(doubleBackToExit){
+        if (doubleBackToExit) {
             finishAffinity()
-        }else{
-            Toast.makeText(this,"뒤로가기를 한 번 더 눌러 종료", Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this, "뒤로가기를 한 번 더 눌러 종료", Toast.LENGTH_LONG).show()
             doubleBackToExit = true
             runDelayed { doubleBackToExit = false }
         }
     }
-    private fun runDelayed(function:()->Unit){
+
+    private fun runDelayed(function: () -> Unit) {
         Handler(Looper.getMainLooper()).postDelayed(function, 1500L)
     }
-    /*private fun getScheduleIn(selectedYear: Int, selectedMonth: Int, selectedDate: Int){
-        Log.d("getSchedule","실행")
-        CoroutineScope(Dispatchers.Main).launch{
-            val load = async(Dispatchers.IO){
-                scheduleLiveData = scheduleInfoDao.getscheduleIn(selectedYear, selectedMonth, selectedDate)for(i in scheduleLiveData!!){
-                    Log.d("fromDB",i.scheduleExplain)
-                }
-            }
-            load.await()
-        }
-    }*/
-
-    /*private fun insertSchedule(scheduleInfo: ScheduleInfo){
-        mScope.launch{
-            withContext(Dispatchers.IO){
-                scheduleInfoDao.insert(scheduleInfo)
-            }
-        }
-    }
-    private fun deleteSchedule(scheduleInfo: ScheduleInfo){
-        mScope.launch{
-            withContext(Dispatchers.IO){
-                scheduleInfoDao.delete(scheduleInfo)
-            }
-        }
-    }*/
 
 
-    private fun initCalendarView(){
+    private fun initCalendarView() {
         calendarView.selectedDate = CalendarDay.today()
         calendarView.state().edit()
             .setFirstDayOfWeek(Calendar.SUNDAY)          // 일주일 시작을 일요일으로
             .setCalendarDisplayMode(CalendarMode.MONTHS) // 달력 모드: 월
             .commit()
 
-        /*val mCalendar = Calendar.getInstance()
-        selectedYear = mCalendar.get(Calendar.YEAR)
-        selectedMonth = mCalendar.get(Calendar.MONTH) + 1
-        selectedDate = mCalendar.get(Calendar.DATE)*/
         showDate(selectedYear!!, selectedMonth!!, selectedDate!!)
 
 
@@ -178,16 +143,20 @@ class MainActivity : AppCompatActivity() {
             scheduleViewModel.year = selectedYear as Int
             scheduleViewModel.month = selectedMonth as Int
             scheduleViewModel.date = selectedDate as Int
-            Log.d("날짜","${scheduleViewModel.year}/${scheduleViewModel.month}/${scheduleViewModel.date}")
             scheduleViewModel.getAllDate().observe(this, Observer { scheduleList ->
-                scheduleList?.let{adapter.setData(it)}
+                scheduleList?.let { adapter.setData(it) }
             })
         }
 
-        calendarView.addDecorators(sundayDecorator, saturdayDecorator, todayDecorator) //decorator 추가
+        calendarView.addDecorators(
+            sundayDecorator,
+            saturdayDecorator,
+            todayDecorator
+        ) //decorator 추가
 
     }
-    private fun showDate(selectedYear:Int, selectedMonth:Int, selectedDate:Int){
+
+    private fun showDate(selectedYear: Int, selectedMonth: Int, selectedDate: Int) {
         selectedDateTextView.setText("${selectedYear}년 ${selectedMonth}월 ${selectedDate}일")
     }
 
