@@ -1,8 +1,10 @@
 package com.example.smartscheduler.Activity
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -31,9 +33,26 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
         startTimeTextView = findViewById(R.id.startTimeTextView)
         finishTimeTextView = findViewById(R.id.finishTimeTextView)
-        year = getIntent().getIntExtra("year", 0)
-        month = getIntent().getIntExtra("month", 0)
-        date = getIntent().getIntExtra("date", 0)
+
+        var sId:Int = 0
+        val getIntent = getIntent()
+        if(!TextUtils.isEmpty(getIntent.getStringExtra("mode"))){
+            //일정 변경
+            val info = getIntent.getSerializableExtra("beforeModify") as ScheduleInfo
+            sId = info.sId
+            setInfo(info)
+        }else{
+            //일정 추가
+            year = getIntent.getIntExtra("year", 0)
+            month = getIntent.getIntExtra("month", 0)
+            date = getIntent.getIntExtra("date", 0)
+
+            cal = Calendar.getInstance()
+            startHour = cal.get(Calendar.HOUR_OF_DAY)
+            startMinute = cal.get(Calendar.MINUTE)
+            finishHour = startHour + 1
+            finishMinute = startMinute
+        }
 
         val scheduleExplain = findViewById<EditText>(R.id.scheduleExplain)
         scheduleTime()
@@ -65,7 +84,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         findViewById<Button>(R.id.saveButton).setOnClickListener {
             if (scheduleExplain.text.toString().isNotEmpty()) {
                 val scheduleInfo = ScheduleInfo(
-                    0,
+                    sId,
                     scheduleExplain.text.toString(),
                     year,
                     month,
@@ -77,18 +96,17 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                     null,
                     null,
                     transportType,
-                    null,
+                    elapsedTime,
                     isAlarmOn
                 )
                 Log.d(
                     "Addschedule",
                     "${scheduleExplain.text}, ${year}, ${month}, ${date}, ${startHour}:${startMinute},${transportType},${isAlarmOn}"
                 )
-                val intent = Intent(this, MainActivity::class.java)
-                intent.putExtra("newSchedule", scheduleInfo)
+                val intent = Intent()
+                intent.putExtra("scheduleInfo", scheduleInfo)
+                setResult(Activity.RESULT_OK, intent)
                 finish()
-                startActivity(intent)
-
             } else {
                 Toast.makeText(this, "일정 내용을 입력해주세요", Toast.LENGTH_LONG).show()
             }
@@ -96,7 +114,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     }
 
     override fun setTime(hour: Int, minute: Int, startOrFinish: Int) {
-        /* interface CompleteListener의 함수 */
+        /* BottomSetScheduleFragment.kt CompleteListener 인터페이스 */
         if (startOrFinish == 0) { //시작 시각 설정
             startHour = hour
             startMinute = minute
@@ -113,11 +131,6 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
     private fun scheduleTime() {
         /* 일정 시간 */
-        cal = Calendar.getInstance()
-        startHour = cal.get(Calendar.HOUR_OF_DAY)
-        startMinute = cal.get(Calendar.MINUTE)
-        finishHour = startHour + 1
-        finishMinute = startMinute
 
         startTimeTextView.text = showTimeTextView(month, date, startHour, startMinute)
         finishTimeTextView.text = showTimeTextView(month, date, finishHour, finishMinute)
@@ -144,5 +157,27 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         return "${month}월 ${date}일 ${hour}시 ${minute}분"
     }
 
+    private fun setInfo(scheduleInfo: ScheduleInfo){
+        findViewById<TextView>(R.id.scheduleExplain).text = scheduleInfo.scheduleExplain
+        year = scheduleInfo.scheduleStartYear
+        month = scheduleInfo.scheduleStartMonth
+        date = scheduleInfo.scheduleStartDay
+        startHour = scheduleInfo.scheduleStartHour
+        startMinute = scheduleInfo.scheduleStartMinute
+        finishHour = scheduleInfo.scheduleFinishHour
+        finishMinute = scheduleInfo.scheduleFinishMinute
+        when(scheduleInfo.transportation){
+            //0: 대중교통, 1: 자동차, 2: 도보
+            0 -> {
+                findViewById<RadioButton>(R.id.publicTransport).isChecked = true
+            }
+            1 -> {
+                findViewById<RadioButton>(R.id.car).isChecked = true
+            }
+            2 -> {
+                findViewById<RadioButton>(R.id.walk).isChecked = true
+            }
+        }
+    }
 
 }

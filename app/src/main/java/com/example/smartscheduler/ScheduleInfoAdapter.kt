@@ -4,10 +4,13 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.PorterDuff
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.TextView
+import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -21,7 +24,8 @@ class ScheduleInfoAdapter(context: Context) :
     private var scheduleList = emptyList<ScheduleInfo>()
     private var alarmOnColor =
         ContextCompat.getColor(context, R.color.design_default_color_secondary)
-
+    private lateinit var scheduleClickListener: OnScheduleClickListener
+    val context:Context = context
     /**
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder).
@@ -58,6 +62,9 @@ class ScheduleInfoAdapter(context: Context) :
 
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
+        viewHolder.scheduleItem.setOnClickListener{ v ->
+            showPopup(v, position)
+        }
         val schedule = scheduleList[position]
         viewHolder.startHour.text = schedule.scheduleStartHour.toString()
         if (schedule.setAlarm) {
@@ -79,4 +86,34 @@ class ScheduleInfoAdapter(context: Context) :
         notifyDataSetChanged()
     }
 
+    private fun showPopup(v:View, position:Int){
+        PopupMenu(context, v).apply{
+            //MainActivity implements OnScheduleClickListener
+            setOnMenuItemClickListener { item ->
+                onMenuItemClick(item, position)
+                true
+            }
+            inflate(R.menu.schedule_modify_delete)
+            show()
+        }
+    }
+    @SuppressLint("NotifyDataSetChanged")
+    private fun onMenuItemClick(item: MenuItem, position:Int): Boolean{
+        return when(item.itemId){
+            R.id.modify -> {
+                this.scheduleClickListener.modify(position)
+                true
+            }
+            R.id.delete->{
+                this.scheduleClickListener.delete(position)
+                Toast.makeText(context, "일정을 삭제했습니다", Toast.LENGTH_LONG).show()
+                true
+            }
+            else -> false
+        }
+    }
+    
+    fun setScheduleClickListener(onScheduleClickListener: OnScheduleClickListener){
+        this.scheduleClickListener = onScheduleClickListener
+    }
 }

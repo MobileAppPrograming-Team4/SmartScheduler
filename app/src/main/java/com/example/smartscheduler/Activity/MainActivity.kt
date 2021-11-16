@@ -1,5 +1,6 @@
 package com.example.smartscheduler.Activity
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.view.Window
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,8 +36,12 @@ class MainActivity : AppCompatActivity() {
     private var doubleBackToExit = false
     private lateinit var adapter: ScheduleInfoAdapter
     private lateinit var scheduleViewModel: ScheduleViewModel
+    lateinit var scheduleList: LiveData<List<ScheduleInfo>>
+    val ADD_SCHEDULE:Int = 100
+    val MODIFY_SCHEDULE:Int = 101
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("onCreate","실행")
         super.onCreate(savedInstanceState)
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.activity_main)
@@ -44,13 +50,8 @@ class MainActivity : AppCompatActivity() {
         adapter = ScheduleInfoAdapter(this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-
-
-        val mCalendar = Calendar.getInstance()
-        selectedYear = mCalendar.get(Calendar.YEAR)
-        selectedMonth = mCalendar.get(Calendar.MONTH) + 1
-        selectedDate = mCalendar.get(Calendar.DATE)
-
+        recyclerView.setHasFixedSize(true)
+        adapter.setScheduleClickListener(onScheduleListener)
         /*
         // 사용자 정보 불러오는 법
         val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
@@ -67,38 +68,17 @@ class MainActivity : AppCompatActivity() {
 
         scheduleViewModel = ViewModelProvider(this).get(ScheduleViewModel::class.java)
 
-        scheduleViewModel.getAllDate().observe(this, Observer { scheduleList ->
-            scheduleList?.let { adapter.setData(it) }
-        })
-
-
         initCalendarView() //달력 설정
-
-        try {
-            /* 일정 설정 화면에서 작성한 일정 정보들 받아오기 */
-            val newSchedule: ScheduleInfo =
-                getIntent()?.getSerializableExtra("newSchedule") as ScheduleInfo
-            Log.d(
-                "MainActivity",
-                "${newSchedule.scheduleExplain}, ${newSchedule.scheduleStartYear}, ${newSchedule.scheduleStartMonth}, ${newSchedule.scheduleStartDay}, ${newSchedule.scheduleStartHour}:${newSchedule.scheduleStartMinute},${newSchedule.transportation},${newSchedule.setAlarm}"
-            )
-            /* insert newSchedule into schedule_database */
-            scheduleViewModel.insert(newSchedule)
-
-        } catch (e: NullPointerException) {
-        }
-
 
         /* 일정 추가하기 버튼 클릭*/
         addSchedule = findViewById(R.id.addScheduleButton)
         addSchedule.setOnClickListener {
             /* 일정 설정 화면으로 이동 */
-            val intent = Intent(this, AddScheduleActivity::class.java)
-            intent.putExtra("year", selectedYear!!)
-            intent.putExtra("month", selectedMonth!!)
-            intent.putExtra("date", selectedDate!!)
-            startActivity(intent)
+            addOrModify(null, selectedYear, selectedMonth, selectedDate)
         }
+        scheduleViewModel.currentData.observe(this, Observer{
+            adapter.setData(it)
+        })
     }
 
     override fun onBackPressed() {
@@ -126,7 +106,10 @@ class MainActivity : AppCompatActivity() {
             .setFirstDayOfWeek(Calendar.SUNDAY)          // 일주일 시작을 일요일으로
             .setCalendarDisplayMode(CalendarMode.MONTHS) // 달력 모드: 월
             .commit()
-
+        selectedYear = calendarView.selectedDate.year
+        selectedMonth = calendarView.selectedDate.month + 1
+        selectedDate = calendarView.selectedDate.date.date
+        scheduleViewModel.getAllDate(selectedYear!!, selectedMonth!!, selectedDate!!)
         showDate(selectedYear!!, selectedMonth!!, selectedDate!!)
 
 
@@ -139,13 +122,7 @@ class MainActivity : AppCompatActivity() {
             selectedMonth = date.month + 1
             selectedDate = date.date.date
             showDate(selectedYear!!, selectedMonth!!, selectedDate!!)
-
-            scheduleViewModel.year = selectedYear as Int
-            scheduleViewModel.month = selectedMonth as Int
-            scheduleViewModel.date = selectedDate as Int
-            scheduleViewModel.getAllDate().observe(this, Observer { scheduleList ->
-                scheduleList?.let { adapter.setData(it) }
-            })
+            scheduleViewModel.getAllDate(selectedYear!!, selectedMonth!!, selectedDate!!)
         }
 
         calendarView.addDecorators(
@@ -160,5 +137,58 @@ class MainActivity : AppCompatActivity() {
         selectedDateTextView.setText("${selectedYear}년 ${selectedMonth}월 ${selectedDate}일")
     }
 
+    private var onScheduleListener:OnScheduleClickListener = object: OnScheduleClickListener{
+        override fun delete(position: Int) {
+            scheduleList = scheduleViewModel.currentData
+            scheduleViewModel.delete(scheduleList.value?.get(position)!!)
+            scheduleViewModel.getAllDate(selectedYear!!, selectedMonth!!, selectedDate!!)
+        }
+        override fun modify(position: Int) {
+            scheduleList = scheduleViewModel.currentData
+            addOrModify(scheduleList.value?.get(position)!!, null, null, null)
+        }
+    }
+    fun addOrModify(scheduleInfo: ScheduleInfo?, year:Int?, month:Int?, date:Int?){
+        val intent = Intent(this, AddScheduleActivity::class.java)
+        if(scheduleInfo == null){ // 일정 추가
+            intent.putExtra("year", year!!)
+            intent.putExtra("month", month!!)
+            intent.putExtra("date", date!!)
+            startActivityForResult(intent, ADD_SCHEDULE)
+        }else{ // 일정 편집
+            intent.putExtra("mode","modify")
+            intent.putExtra("beforeModify",scheduleInfo)
+            startActivityForResult(intent, MODIFY_SCHEDULE)
+        }
+    }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        /* onActivityResult -> onResume */
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                ADD_SCHEDULE -> {
+                    val newSchedule: ScheduleInfo =
+                        data!!.getSerializableExtra("scheduleInfo") as ScheduleInfo
+                    /* insert newSchedule into schedule_database */
+                    scheduleViewModel.insert(newSchedule)
+                    Toast.makeText(this, "일정을 추가했습니다", Toast.LENGTH_LONG).show()
+                    selectedYear = newSchedule.scheduleStartYear
+                    selectedMonth = newSchedule.scheduleStartMonth
+                    selectedDate = newSchedule.scheduleStartDay
+                    scheduleViewModel.getAllDate(selectedYear!!, selectedMonth!!, selectedDate!!)
+                }
+                MODIFY_SCHEDULE -> {
+                    val modifySchedule: ScheduleInfo = data!!.getSerializableExtra("scheduleInfo") as ScheduleInfo
+                    /* update schedule_database */
+                    scheduleViewModel.update(modifySchedule)
+                    Toast.makeText(this, "일정을 변경했습니다", Toast.LENGTH_LONG).show()
+                    selectedYear = modifySchedule.scheduleStartYear
+                    selectedMonth = modifySchedule.scheduleStartMonth
+                    selectedDate = modifySchedule.scheduleStartDay
+                    scheduleViewModel.getAllDate(selectedYear!!, selectedMonth!!, selectedDate!!)
+                }
+            }
+        }
+    }
 }

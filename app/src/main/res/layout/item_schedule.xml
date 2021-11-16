@@ -4,12 +4,15 @@
     xmlns:toolsNs="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
     <androidx.cardview.widget.CardView
         android:id="@+id/scheduleItem"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp"
+        app:cardCornerRadius="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -62,11 +65,11 @@
                 android:textSize="18sp"
                 toolsNs:text="dinner" />
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </androidx.cardview.widget.CardView><!--
     <View
         android:layout_width="match_parent"
         android:layout_height="2.5px"
         android:background="?attr/colorPrimary"
-        />
+        />-->
 
 </LinearLayout>

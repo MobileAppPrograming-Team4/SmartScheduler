@@ -1,9 +1,6 @@
 package com.example.smartscheduler.Database
 
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.LiveData
-import com.example.smartscheduler.Database.ScheduleInfo
-import com.example.smartscheduler.Database.ScheduleInfoDao
 
 
 class ScheduleRepository(private val scheduleInfoDao: ScheduleInfoDao) {
@@ -17,10 +14,16 @@ class ScheduleRepository(private val scheduleInfoDao: ScheduleInfoDao) {
     suspend fun insert(scheduleInfo: ScheduleInfo) {
         scheduleInfoDao.insert(scheduleInfo)
     }
-    fun getAllMonth(year:Int, month:Int): LiveData<List<ScheduleInfo>>{
+    suspend fun delete(scheduleInfo: ScheduleInfo) {
+        scheduleInfoDao.delete(scheduleInfo)
+    }
+    suspend fun update(scheduleInfo: ScheduleInfo) {
+        scheduleInfoDao.update(scheduleInfo)
+    }
+    fun getAllMonth(year:Int, month:Int): List<ScheduleInfo>{
         return scheduleInfoDao.getAllMonth(year, month)
     }
-    fun getAllDate(year:Int, month:Int, date:Int): LiveData<List<ScheduleInfo>>{
+    fun getAllDate(year:Int, month:Int, date:Int): List<ScheduleInfo>{
         return scheduleInfoDao.getAllDate(year, month, date)
     }
 }
