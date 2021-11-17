@@ -13,6 +13,6 @@ class EventDecorator(color:Int, dates:Collection<CalendarDay>): DayViewDecorator
     }
 
     override fun decorate(view: DayViewFacade?) {
-        view?.addSpan(DotSpan(5F, color))
+        view?.addSpan(DotSpan(10F, color))
     }
 }

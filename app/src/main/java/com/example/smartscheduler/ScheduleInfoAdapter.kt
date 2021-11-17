@@ -23,7 +23,8 @@ class ScheduleInfoAdapter(context: Context) :
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var scheduleList = emptyList<ScheduleInfo>()
     private var alarmOnColor =
-        ContextCompat.getColor(context, R.color.design_default_color_secondary)
+        ContextCompat.getColor(context, R.color.yellow)
+        //ContextCompat.getColor(context, R.color.design_default_color_secondary)
     private lateinit var scheduleClickListener: OnScheduleClickListener
     val context:Context = context
     /**

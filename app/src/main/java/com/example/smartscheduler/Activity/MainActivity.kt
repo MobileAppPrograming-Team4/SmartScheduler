@@ -2,6 +2,7 @@ package com.example.smartscheduler.Activity
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color.parseColor
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -18,11 +19,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.smartscheduler.*
 import com.example.smartscheduler.Database.ScheduleInfo
 import com.example.smartscheduler.Database.ScheduleViewModel
-import com.example.smartscheduler.Decorator.SaturdayDecorator
-import com.example.smartscheduler.Decorator.SundayDecorator
-import com.example.smartscheduler.Decorator.TodayDecorator
+import com.example.smartscheduler.Decorator.*
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.CalendarMode
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: ScheduleInfoAdapter
     private lateinit var scheduleViewModel: ScheduleViewModel
     lateinit var scheduleList: LiveData<List<ScheduleInfo>>
+    var scheduleMonth: ArrayList<CalendarDay> = ArrayList<CalendarDay>()
     val ADD_SCHEDULE:Int = 100
     val MODIFY_SCHEDULE:Int = 101
 
@@ -79,6 +80,21 @@ class MainActivity : AppCompatActivity() {
         scheduleViewModel.currentData.observe(this, Observer{
             adapter.setData(it)
         })
+        scheduleViewModel.monthData.observe(this, Observer{
+            if (it.isNotEmpty()){
+                scheduleMonth.clear()
+                for ( i in it.indices){
+                    val dotYear = it[i].scheduleStartYear
+                    val dotMonth = it[i].scheduleStartMonth - 1
+                    val dotDate = it[i].scheduleStartDay
+                    val date = Calendar.getInstance()
+                    date.set(dotYear, dotMonth, dotDate)
+                    scheduleMonth.add(CalendarDay.from(date))
+                }
+            calendarView.addDecorator(EventDecorator(parseColor("#c88719"), scheduleMonth))
+            }
+        })
+
     }
 
     override fun onBackPressed() {
@@ -106,10 +122,16 @@ class MainActivity : AppCompatActivity() {
             .setFirstDayOfWeek(Calendar.SUNDAY)          // 일주일 시작을 일요일으로
             .setCalendarDisplayMode(CalendarMode.MONTHS) // 달력 모드: 월
             .commit()
+        calendarView.setTitleFormatter {
+            val titleFormat =
+                SimpleDateFormat("yyyy년 MM월")
+            titleFormat.format(calendarView.selectedDate.date)
+        }
         selectedYear = calendarView.selectedDate.year
         selectedMonth = calendarView.selectedDate.month + 1
         selectedDate = calendarView.selectedDate.date.date
         scheduleViewModel.getAllDate(selectedYear!!, selectedMonth!!, selectedDate!!)
+        scheduleViewModel.getAllMonth(selectedYear!!, selectedMonth!!)
         showDate(selectedYear!!, selectedMonth!!, selectedDate!!)
 
 
@@ -124,11 +146,20 @@ class MainActivity : AppCompatActivity() {
             showDate(selectedYear!!, selectedMonth!!, selectedDate!!)
             scheduleViewModel.getAllDate(selectedYear!!, selectedMonth!!, selectedDate!!)
         }
+        calendarView.setOnMonthChangedListener { widget, date ->
+            Log.d("달력","달 변경")
+            calendarView.setTitleFormatter {
+                val titleFormat =
+                    SimpleDateFormat("yyyy년 MM월")
+                titleFormat.format(date.date)
+            }
+            scheduleViewModel.getAllMonth(date.year, date.month + 1)
+        }
 
         calendarView.addDecorators(
             sundayDecorator,
             saturdayDecorator,
-            todayDecorator
+            todayDecorator,
         ) //decorator 추가
 
     }
@@ -142,6 +173,7 @@ class MainActivity : AppCompatActivity() {
             scheduleList = scheduleViewModel.currentData
             scheduleViewModel.delete(scheduleList.value?.get(position)!!)
             scheduleViewModel.getAllDate(selectedYear!!, selectedMonth!!, selectedDate!!)
+            scheduleViewModel.getAllMonth(selectedYear!!, selectedMonth!!)
         }
         override fun modify(position: Int) {
             scheduleList = scheduleViewModel.currentData
@@ -177,6 +209,7 @@ class MainActivity : AppCompatActivity() {
                     selectedMonth = newSchedule.scheduleStartMonth
                     selectedDate = newSchedule.scheduleStartDay
                     scheduleViewModel.getAllDate(selectedYear!!, selectedMonth!!, selectedDate!!)
+                    scheduleViewModel.getAllMonth(selectedYear!!, selectedMonth!!)
                 }
                 MODIFY_SCHEDULE -> {
                     val modifySchedule: ScheduleInfo = data!!.getSerializableExtra("scheduleInfo") as ScheduleInfo
