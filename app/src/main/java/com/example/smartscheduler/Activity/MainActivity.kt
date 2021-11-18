@@ -2,6 +2,7 @@ package com.example.smartscheduler.Activity
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color.parseColor
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.Window
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.LiveData
@@ -30,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var selectedDateTextView: TextView
     private lateinit var addSchedule: Button
     private lateinit var calendarView: com.prolificinteractive.materialcalendarview.MaterialCalendarView
+    private lateinit var settingBt : ImageButton
     var selectedYear: Int? = null
     var selectedMonth: Int? = null
     var selectedDate: Int? = null
@@ -95,6 +98,23 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        /* setting button 클릭 */
+        settingBt = findViewById(R.id.settingButton)
+        settingBt.setOnClickListener {
+            /* UserInfoActivity 화면으로 이동 */
+            goToUserInfo()
+        }
+    }
+
+    private fun goToUserInfo() {
+        val intent = Intent(this, UserInfoActivity::class.java)
+        val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
+        val editor: SharedPreferences.Editor = userInfo.edit()
+
+        editor.putInt("readyTime", 0)
+        editor.putInt("sleepTime", 0)
+        editor.apply()
+        startActivity(intent)
     }
 
     override fun onBackPressed() {
