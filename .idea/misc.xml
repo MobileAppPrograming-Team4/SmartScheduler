@@ -15,6 +15,7 @@
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_addschedule.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_calendar.xml" value="0.19947916666666668" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_main.xml" value="0.22" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_test.xml" value="0.1" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_userinfo.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/bottom_setschedule.xml" value="0.1" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/fragment_bottomsetschedule.xml" value="0.18342391304347827" />
@@ -33,7 +34,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="11" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">
