@@ -21,6 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activity.AddScheduleActivity"/>
+        <activity android:name=".Activity.PublicRouteActivity"/>
     </application>
 
 </manifest>

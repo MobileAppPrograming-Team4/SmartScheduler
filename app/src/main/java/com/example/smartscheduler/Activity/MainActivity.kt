@@ -199,6 +199,11 @@ class MainActivity : AppCompatActivity() {
             scheduleList = scheduleViewModel.currentData
             addOrModify(scheduleList.value?.get(position)!!, null, null, null)
         }
+
+        override fun route(position: Int) {
+            scheduleList = scheduleViewModel.currentData
+            goToRoute(scheduleList.value?.get(position)!!, selectedYear!!, selectedMonth!!, selectedDate!!)
+        }
     }
     fun addOrModify(scheduleInfo: ScheduleInfo?, year:Int?, month:Int?, date:Int?){
         val intent = Intent(this, AddScheduleActivity::class.java)
@@ -212,6 +217,11 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("beforeModify",scheduleInfo)
             startActivityForResult(intent, MODIFY_SCHEDULE)
         }
+    }
+
+    fun goToRoute(scheduleInfo: ScheduleInfo?, year: Int?, month: Int?, date: Int?) {
+        val intent = Intent(this, PublicRouteActivity::class.java)
+        startActivity(intent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

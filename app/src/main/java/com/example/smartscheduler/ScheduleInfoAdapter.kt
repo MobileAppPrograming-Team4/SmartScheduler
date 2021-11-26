@@ -105,6 +105,10 @@ class ScheduleInfoAdapter(context: Context) :
                 this.scheduleClickListener.modify(position)
                 true
             }
+            R.id.route -> {
+                this.scheduleClickListener.route(position)
+                true
+            }
             R.id.delete->{
                 this.scheduleClickListener.delete(position)
                 Toast.makeText(context, "일정을 삭제했습니다", Toast.LENGTH_LONG).show()
