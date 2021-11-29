@@ -12,6 +12,13 @@ import com.example.smartscheduler.*
 import com.example.smartscheduler.Database.ScheduleInfo
 import java.util.*
 
+import com.odsay.odsayandroidsdk.API;
+import com.odsay.odsayandroidsdk.ODsayData;
+import com.odsay.odsayandroidsdk.ODsayService;
+import com.odsay.odsayandroidsdk.OnResultCallbackListener;
+
+import org.json.JSONObject;
+
 class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.CompleteListener {
     lateinit var startTimeTextView: TextView
     lateinit var finishTimeTextView: TextView
@@ -24,7 +31,12 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     var year = 0
     var month = 0
     var date = 0
-    var elapsedTime: Int? = null
+    var totalTime: Int? = null
+    var alarmHour = 0
+    var alarmMinute = 0
+
+    lateinit var odsayService: ODsayService
+    lateinit var jsonObject: JSONObject
 
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,14 +46,14 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         startTimeTextView = findViewById(R.id.startTimeTextView)
         finishTimeTextView = findViewById(R.id.finishTimeTextView)
 
-        var sId:Int = 0
+        var sId: Int = 0
         val getIntent = getIntent()
-        if(!TextUtils.isEmpty(getIntent.getStringExtra("mode"))){
+        if (!TextUtils.isEmpty(getIntent.getStringExtra("mode"))) {
             //일정 변경
             val info = getIntent.getSerializableExtra("beforeModify") as ScheduleInfo
             sId = info.sId
             setInfo(info)
-        }else{
+        } else {
             //일정 추가
             year = getIntent.getIntExtra("year", 0)
             month = getIntent.getIntExtra("month", 0)
@@ -73,6 +85,19 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 else -> transportType = null
             }
         }
+
+        when (transportType) {
+            0 -> totalTime = setPublicTime()
+            1 -> totalTime = 10
+            2 -> totalTime = 10
+            else -> totalTime = 0
+        }
+
+        val elapsedTime = totalTime
+
+        alarmHour = startHour + (elapsedTime!! / 60)
+        alarmMinute = startMinute + (elapsedTime!! % 60)
+
         /* place Information */
         var isAlarmOn: Boolean = true
         val setAlarmSwitch = findViewById<Switch>(R.id.setAlarm)
@@ -97,8 +122,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                     null,
                     transportType,
                     elapsedTime,
-                    startHour,
-                    startMinute + 1,
+                    alarmHour,
+                    alarmMinute,
                     isAlarmOn
                 )
                 Log.d(
@@ -159,7 +184,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         return "${month}월 ${date}일 ${hour}시 ${minute}분"
     }
 
-    private fun setInfo(scheduleInfo: ScheduleInfo){
+    private fun setInfo(scheduleInfo: ScheduleInfo) {
         findViewById<TextView>(R.id.scheduleExplain).text = scheduleInfo.scheduleExplain
         year = scheduleInfo.scheduleStartYear
         month = scheduleInfo.scheduleStartMonth
@@ -168,7 +193,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         startMinute = scheduleInfo.scheduleStartMinute
         finishHour = scheduleInfo.scheduleFinishHour
         finishMinute = scheduleInfo.scheduleFinishMinute
-        when(scheduleInfo.transportation){
+        when (scheduleInfo.transportation) {
             //0: 대중교통, 1: 자동차, 2: 도보
             0 -> {
                 findViewById<RadioButton>(R.id.publicTransport).isChecked = true
@@ -182,4 +207,42 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         }
     }
 
+    private fun setPublicTime(): Int {
+        var totalTime: Int = -1
+
+        odsayService = ODsayService.init(
+            this,
+            BuildConfig.ODsay_API_KEY
+        )
+        odsayService.setConnectionTimeout(5000)
+        odsayService.setReadTimeout(5000)
+
+        odsayService.requestSearchPubTransPath(
+            "128.61027824041773",
+            "35.88902720456651",
+            "128.6017393692533",
+            "35.87155237703856",
+            null,
+            null,
+            null,
+            object : OnResultCallbackListener {
+                override fun onSuccess(odsayData: ODsayData, api: API) {
+                    jsonObject = odsayData!!.json
+
+                    val routeResult = jsonObject.getJSONObject("result")
+                    val pathArray = routeResult.getJSONArray("path")
+                    val firstPath = pathArray.getJSONObject(0)
+                    val pathInfo = firstPath.getJSONObject("info")
+
+                    totalTime = pathInfo.getInt("totalTime")
+                }
+
+                override fun onError(code: Int, message: String, api: API) {
+                    totalTime = -1
+                }
+            }
+        )
+
+        return totalTime
+    }
 }
