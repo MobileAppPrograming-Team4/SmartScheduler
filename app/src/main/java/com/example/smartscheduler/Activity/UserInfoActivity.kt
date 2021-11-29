@@ -10,7 +10,7 @@ import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.smartscheduler.R
-import net.daum.mf.map.api.MapView
+// import net.daum.mf.map.api.MapView
 
 class UserInfoActivity : AppCompatActivity() {
 
@@ -42,10 +42,10 @@ class UserInfoActivity : AppCompatActivity() {
             finish()
         }
 
-        val mapView = MapView(this)
+        // val mapView = MapView(this)
         map = findViewById(R.id.clKakaoMapView)
         curloc = findViewById(R.id.currentLocationButton)
-        map.addView(mapView)
+        // map.addView(mapView)
 
         //3. 레이아웃 변수 초기화
         readyTimeEditText = findViewById<EditText>(R.id.scheduleExplain)

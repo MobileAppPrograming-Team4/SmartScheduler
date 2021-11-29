@@ -97,8 +97,12 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
         val elapsedTime = totalTime
 
-        alarmHour = startHour + (elapsedTime!! / 60)
-        alarmMinute = startMinute + (elapsedTime!! % 60)
+        alarmHour = startHour - (elapsedTime!! / 60)
+        alarmMinute = startMinute - (elapsedTime!! % 60)
+        if (alarmMinute < 0) {
+            alarmHour -= 1
+            alarmMinute += 60
+        }
 
         /* place Information */
         var isAlarmOn: Boolean = true
