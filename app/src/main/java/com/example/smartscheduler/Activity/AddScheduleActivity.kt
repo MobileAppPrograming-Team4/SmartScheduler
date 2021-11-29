@@ -8,6 +8,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.smartscheduler.*
 import com.example.smartscheduler.Database.ScheduleInfo
 import java.util.*
@@ -24,6 +25,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     lateinit var finishTimeTextView: TextView
     lateinit var cal: Calendar
     lateinit var transportGroup: RadioGroup
+    lateinit var map: ConstraintLayout
     var startHour = 0
     var startMinute = 0
     var finishHour = 0

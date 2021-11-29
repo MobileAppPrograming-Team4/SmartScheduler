@@ -177,7 +177,6 @@ class MainActivity : AppCompatActivity() {
         editor.putInt("sleepTime", 0)
         editor.apply()
         startActivity(intent)
-        getAlarm()
     }
 
     override fun onBackPressed() {
