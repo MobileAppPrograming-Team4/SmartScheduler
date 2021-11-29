@@ -1,9 +1,14 @@
 package com.example.smartscheduler.Activity
 
+import android.annotation.TargetApi
 import android.app.Activity
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color.parseColor
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -104,6 +109,63 @@ class MainActivity : AppCompatActivity() {
             /* UserInfoActivity 화면으로 이동 */
             goToUserInfo()
         }
+
+        scheduleViewModel.alarmData.observe(this, {
+            setAlarm(it, this)
+        })
+        getAlarm()
+
+    }
+    private fun getAlarm(){
+        //database에서 오늘 알람이 켜져있는 일정 모두 가져오기
+        val cal = Calendar.getInstance(Locale.KOREA)
+        val currentYear = cal.get(Calendar.YEAR)
+        val currentMonth = cal.get(Calendar.MONTH) + 1
+        val currentDate = cal.get(Calendar.DATE)
+        scheduleViewModel.getAlarm(currentYear, currentMonth, currentDate)
+    }
+
+    //private val M_ALARM_REQUEST_CODE = 1000
+    @TargetApi(Build.VERSION_CODES.M)
+    private fun setAlarm(list: List<ScheduleInfo>, context: Context) {
+        val alarmManager: AlarmManager =
+            context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val calendar = Calendar.getInstance(Locale.KOREA)
+
+        for(item in list){
+            //알람이 울릴 시간 설정
+            calendar.set(Calendar.HOUR_OF_DAY, item.alarmHour!!)
+            calendar.set(Calendar.MINUTE, item.alarmMinute!!)
+            calendar.set(Calendar.SECOND, 0)
+
+            //AlarmReceiver에 값 전달
+            val intent = Intent(context, AlarmReceiver::class.java) //알람 조건이 충족되었을 때, 리시버로 전달될 인텐트 설정
+
+            if (calendar.before(Calendar.getInstance(Locale.KOREA))) {
+                //현재시간보다 빠른 알람은 취소
+                val pendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    item.sId,
+                    intent,
+                    PendingIntent.FLAG_CANCEL_CURRENT
+                )
+                pendingIntent?.cancel()
+                continue
+            }
+
+            val alarmIntent = PendingIntent.getBroadcast(
+                context,
+                item.sId,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
+
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                calendar.timeInMillis,
+                alarmIntent
+            )
+        }
     }
 
     private fun goToUserInfo() {
@@ -115,6 +177,7 @@ class MainActivity : AppCompatActivity() {
         editor.putInt("sleepTime", 0)
         editor.apply()
         startActivity(intent)
+        getAlarm()
     }
 
     override fun onBackPressed() {
@@ -194,6 +257,7 @@ class MainActivity : AppCompatActivity() {
             scheduleViewModel.delete(scheduleList.value?.get(position)!!)
             scheduleViewModel.getAllDate(selectedYear!!, selectedMonth!!, selectedDate!!)
             scheduleViewModel.getAllMonth(selectedYear!!, selectedMonth!!)
+            getAlarm()
         }
         override fun modify(position: Int) {
             scheduleList = scheduleViewModel.currentData
@@ -240,6 +304,7 @@ class MainActivity : AppCompatActivity() {
                     selectedDate = newSchedule.scheduleStartDay
                     scheduleViewModel.getAllDate(selectedYear!!, selectedMonth!!, selectedDate!!)
                     scheduleViewModel.getAllMonth(selectedYear!!, selectedMonth!!)
+                    getAlarm()
                 }
                 MODIFY_SCHEDULE -> {
                     val modifySchedule: ScheduleInfo = data!!.getSerializableExtra("scheduleInfo") as ScheduleInfo
@@ -250,6 +315,7 @@ class MainActivity : AppCompatActivity() {
                     selectedMonth = modifySchedule.scheduleStartMonth
                     selectedDate = modifySchedule.scheduleStartDay
                     scheduleViewModel.getAllDate(selectedYear!!, selectedMonth!!, selectedDate!!)
+                    getAlarm()
                 }
             }
         }

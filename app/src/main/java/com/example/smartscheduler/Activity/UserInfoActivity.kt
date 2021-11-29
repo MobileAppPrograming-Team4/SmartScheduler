@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.smartscheduler.R
@@ -17,6 +18,7 @@ class UserInfoActivity : AppCompatActivity() {
     lateinit var sleepTimeEditText: EditText
     lateinit var saveButton: Button
     lateinit var map: ConstraintLayout
+    lateinit var curloc : ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +44,7 @@ class UserInfoActivity : AppCompatActivity() {
 
         val mapView = MapView(this)
         map = findViewById(R.id.clKakaoMapView)
+        curloc = findViewById(R.id.currentLocationButton)
         map.addView(mapView)
 
         //3. 레이아웃 변수 초기화

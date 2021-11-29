@@ -134,6 +134,12 @@
                         android:gravity="center"
                         android:text="기본 출발 장소"
                         android:textSize="14sp" />
+                    <ImageButton
+                        android:id="@+id/currentLocationButton"
+                        android:layout_gravity="right"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:src="@drawable/ic_baseline_my_location_24"/>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/clKakaoMapView"
