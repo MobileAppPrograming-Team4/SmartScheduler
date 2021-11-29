@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.smartscheduler">
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -9,10 +10,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartScheduler">
+
+        <receiver android:name=".AlarmReceiver"  android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.INPUT_METHOD_CHANGED" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".Activity.MainActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true" />
         <activity android:name=".Activity.UserInfoActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

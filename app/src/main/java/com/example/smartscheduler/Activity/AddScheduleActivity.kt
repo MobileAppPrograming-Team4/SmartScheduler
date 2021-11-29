@@ -97,6 +97,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                     null,
                     transportType,
                     elapsedTime,
+                    startHour,
+                    startMinute + 1,
                     isAlarmOn
                 )
                 Log.d(

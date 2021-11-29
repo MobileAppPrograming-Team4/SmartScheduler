@@ -21,6 +21,8 @@ data class ScheduleInfo(
     @ColumnInfo(name = "schedule_place_y") var schedulePlace_y: Int?, // 장소 y
     @ColumnInfo(name = "transportation") var transportation: Int?, //0: 대중교통, 1: 자동차, 2: 도보
     @ColumnInfo(name = "elapsed_time") var elapsedTime: Int?, // 예상이동시간
+    @ColumnInfo(name = "alarm_hour") var alarmHour: Int?, //알람 시각(시)
+    @ColumnInfo(name = "alarm_minute") var alarmMinute: Int?, //알람 시각(분)
     @ColumnInfo(name = "set_alarm") var setAlarm: Boolean // 알람설정 여부
 ):Serializable
 
