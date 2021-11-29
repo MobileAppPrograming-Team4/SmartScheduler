@@ -99,7 +99,7 @@ class PublicRouteActivity : AppCompatActivity() {
                     for (i in 0 until graphArray.length()) {
                         val coordinate = graphArray.getJSONObject(i)
 
-                        polyline.addPoint(MapPoint.mapPointWithGeoCoord(coordinate.getDouble("x"), coordinate.getDouble("y")));
+                        polyline.addPoint(MapPoint.mapPointWithGeoCoord(coordinate.getDouble("y"), coordinate.getDouble("x")));
                     }
 
                     mapView.addPolyline(polyline);
