@@ -124,7 +124,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="300dp"
                     android:orientation="vertical"
                     android:layout_margin="10dp">
 
@@ -134,6 +134,21 @@
                         android:gravity="center"
                         android:text="기본 출발 장소"
                         android:textSize="14sp" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/clKakaoMapView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="20dp"
+                        app:layout_constraintTop_toBottomOf="@+id/textView" />
+<!--                    <Button-->
+<!--                        android:id="@+id/referLocButton"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="조회"-->
+<!--                        android:textSize="14sp"-->
+<!--                        android:textColor="@color/black"-->
+<!--                        android:layout_gravity="center" />-->
 
 
                 </LinearLayout>

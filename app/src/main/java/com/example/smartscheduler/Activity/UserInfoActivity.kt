@@ -7,19 +7,24 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.smartscheduler.R
+import net.daum.mf.map.api.MapView
 
 class UserInfoActivity : AppCompatActivity() {
+
     lateinit var readyTimeEditText: EditText
     lateinit var sleepTimeEditText: EditText
     lateinit var saveButton: Button
+    lateinit var map: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_userinfo)
 
+
         // 1. Shared Preference 초기화
-        val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
+        val userInfo: SharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
         val editor: SharedPreferences.Editor = userInfo.edit()
 
         //2. 저장된 값 불러오기
@@ -28,12 +33,16 @@ class UserInfoActivity : AppCompatActivity() {
         //출발장소 위도
         //출발장소 경도
 
+
         if(readyTime>0 && sleepTime>0){
         // 정보를 설정한 적이 있다면 activity_userinfo.xml을 보여주지 않음
             gotoMain()
             finish()
         }
 
+        val mapView = MapView(this)
+        map = findViewById(R.id.clKakaoMapView)
+        map.addView(mapView)
 
         //3. 레이아웃 변수 초기화
         readyTimeEditText = findViewById<EditText>(R.id.scheduleExplain)

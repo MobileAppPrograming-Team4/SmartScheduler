@@ -11,6 +11,10 @@ android {
 
     compileSdkVersion 31
 
+    buildFeatures {
+        dataBinding = true
+    }
+
     defaultConfig {
         applicationId "com.example.smartscheduler"
         minSdk 21
@@ -40,6 +44,7 @@ android {
 
 dependencies {
 
+    kapt "com.android.databinding:compiler:3.0.1"
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'com.google.android.material:material:1.4.0'
@@ -62,6 +67,6 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
     // ODsay SDK module
     implementation files('../libs/ODsayAndroidSDK.aar')
-    // Kotlin + Coroutines
-    implementation "androidx.work:work-runtime-ktx:2.5.0"
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation files('libs/libDaumMapAndroid.jar')
 }
