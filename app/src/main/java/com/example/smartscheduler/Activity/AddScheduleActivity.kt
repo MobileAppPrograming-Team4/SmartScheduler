@@ -17,8 +17,14 @@ import com.odsay.odsayandroidsdk.API;
 import com.odsay.odsayandroidsdk.ODsayData;
 import com.odsay.odsayandroidsdk.ODsayService;
 import com.odsay.odsayandroidsdk.OnResultCallbackListener;
+import net.daum.mf.map.api.MapView
 
 import org.json.JSONObject;
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.CompleteListener {
     lateinit var startTimeTextView: TextView
@@ -26,6 +32,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     lateinit var cal: Calendar
     lateinit var transportGroup: RadioGroup
     lateinit var map: ConstraintLayout
+    lateinit var location: EditText
+    lateinit var searchButton: ImageButton
     var startHour = 0
     var startMinute = 0
     var finishHour = 0
@@ -40,6 +48,11 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     lateinit var odsayService: ODsayService
     lateinit var jsonObject: JSONObject
 
+    companion object {
+        const val BASE_URL = "https://dapi.kakao.com/"
+        const val API_KEY = "KakaoAK 28f1a9b662dea4d3296bfaa59f4590b3"  // REST API 키
+    }
+
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +60,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
         startTimeTextView = findViewById(R.id.startTimeTextView)
         finishTimeTextView = findViewById(R.id.finishTimeTextView)
+        location = findViewById(R.id.locationString)
+        searchButton = findViewById(R.id.locationSearchButton)
 
         var sId: Int = 0
         val getIntent = getIntent()
@@ -67,6 +82,15 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             finishHour = startHour + 1
             finishMinute = startMinute
         }
+
+        searchButton.setOnClickListener {
+            searchKeyword(location.text.toString())
+        }
+
+
+        val mapView = MapView(this)
+        map = findViewById(R.id.clKakaoMapView)
+        map.addView(mapView)
 
         val scheduleExplain = findViewById<EditText>(R.id.scheduleExplain)
         scheduleTime()
@@ -140,6 +164,33 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 Toast.makeText(this, "일정 내용을 입력해주세요", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    //키워드 검색 함
+    private fun searchKeyword(keyword: String) {
+        val retrofit = Retrofit.Builder()   // Retrofit 구성
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        val api = retrofit.create(kakaoAPI::class.java)   // 통신 인터페이스를 객체로 생성
+        val call = api.getSearchKeyword(API_KEY, keyword)   // 검색 조건 입력
+
+        // API 서버에 요청
+        call.enqueue(object: Callback<ResultSearchKeyword> {
+            override fun onResponse(
+                call: Call<ResultSearchKeyword>,
+                response: Response<ResultSearchKeyword>
+            ) {
+                // 통신 성공 (검색 결과는 response.body()에 담겨있음)
+                Log.d("Test", "Raw: ${response.raw()}")
+                Log.d("Test", "Body: ${response.body()}")
+            }
+
+            override fun onFailure(call: Call<ResultSearchKeyword>, t: Throwable) {
+                // 통신 실패
+                Log.w("MainActivity", "통신 실패: ${t.message}")
+            }
+        })
     }
 
     override fun setTime(hour: Int, minute: Int, startOrFinish: Int) {
