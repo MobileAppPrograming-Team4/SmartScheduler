@@ -129,7 +129,7 @@
 
             </androidx.cardview.widget.CardView>
 
-            <!-- 지도 이미지 -->
+            <!-- 지도 이미지
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -152,11 +152,12 @@
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
+            -->
 
             <!-- 이동 노선 -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
                 app:cardCornerRadius="30dp">
 
@@ -174,13 +175,32 @@
                         android:text="이동 노선"
                         android:textSize="14sp" />
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/publicRouteRecyclerView"
+                    <TextView
+                        android:id="@+id/startAndFinal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center">
+                        android:gravity="center"
+                        android:text="출발 정류장 → 도착 정류장"
+                        android:textSize="16sp" />
 
-                    </androidx.recyclerview.widget.RecyclerView>
+                    <TextView
+                        android:id="@+id/stationCount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="20dp"
+                        android:gravity="center"
+                        android:text="0개 정류장(역) 이동"
+                        android:textSize="14sp" />
+
+                    <ListView
+                        android:id="@+id/publicRouteListView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:dividerHeight="0px"
+                        android:divider="#FFFFFF"
+                        android:listSelector="@android:color/transparent"
+                        >
+                    </ListView>
 
 
                 </LinearLayout>
