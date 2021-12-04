@@ -41,7 +41,7 @@ class CarRoute : AppCompatActivity() {
         setContentView(R.layout.activity_carroute)
 
 
-        var intent = Intent(this,gps::class.java)
+        //var intent = Intent(this,gps::class.java)
         startActivity(intent)
 
         val mapView = MapView(this)

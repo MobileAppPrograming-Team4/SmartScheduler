@@ -2,7 +2,6 @@ package com.example.smartscheduler.Activity
 
 
 import android.Manifest
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -19,18 +18,14 @@ import com.example.smartscheduler.R
 import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
 import android.widget.TextView
-
 import android.location.LocationManager
-import android.media.audiofx.BassBoost
-import android.net.Uri
 import android.os.Build
-import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AlertDialog.*
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import net.daum.mf.map.api.MapPOIItem
-
+import kotlinx.android.synthetic.main.activity_main.*
 
 
 
@@ -42,30 +37,9 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
     lateinit var saveButton: Button
     lateinit var map: ConstraintLayout
     lateinit var curloc : ImageButton
-    private val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
-    private val PERMISSIONS_REQUEST_ACCESS_CALL_PHONE = 2
-    // 중요...
 
-
-    // 위치 정보
-    var txtCurrentPositionInfo: TextView? = null
-
-    // 위치 버튼
-    var btnCurrentPositionInfo: TextView? = null
-    var longitude = 1.0
-    var latitude = 0.0
-    var altitude //고도
-            = 0.0
-    var accuracy //정확도
-            = 0f
-    var provider //위치제공자
-            : String? = null
-    var currentLocation // 그래서 최종 위치
-            : String? = null
-    val mapView = MapView(this)
-    companion object {
-        const val PERMISSION_REQUEST_CODE = 1001
-    }
+    var tmpLatitude : Double = 0.0
+    var tmpLongitude : Double = 0.0
 
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -116,13 +90,10 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
             finish()
         }
 
-
+        val mapView = MapView(this)
         map = findViewById(R.id.clKakaoMapView)
         curloc = findViewById(R.id.currentLocationButton)
         map.addView(mapView)
-
-
-
 
 
         // 현재위치 클릭
@@ -131,13 +102,54 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
            val isNetworkEnabled = lm?.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
            mapView.setCurrentLocationEventListener(this)
 //           mapView.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading
-           lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, gpsListener)
-           lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100, 1, gpsListener)
-           Log.d(
-               "Test", "GPS Location changed, Latitude: $latitude" +
-                       ", Longitude: $longitude" + ", isGPSEnabled: $isGPSEnabled" + ", isNetworkEnabled: $isNetworkEnabled"
-           )
-           setDaumMapCurrentLocation(latitude, longitude)
+           //lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, gpsListener)
+           //lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100, 1, gpsListener)
+//           Log.d(
+//               "Test", "GPS Location changed, Latitude: $latitude" +
+//                       ", Longitude: $longitude" + ", isGPSEnabled: $isGPSEnabled" + ", isNetworkEnabled: $isNetworkEnabled"
+//           )
+
+           //매니페스트에 권한이 추가되어 있다해도 여기서 다시 한번 확인해야함
+           if (Build.VERSION.SDK_INT >= 23 &&
+               ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+               ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 0)
+           } else {
+               when { //프로바이더 제공자 활성화 여부 체크
+                   isNetworkEnabled == true -> {
+                       val location = lm?.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) //인터넷기반으로 위치를 찾음
+                       var getLongitude = location?.longitude!!
+                       var getLatitude = location.latitude
+                       tmpLatitude = getLatitude
+                       tmpLongitude = getLongitude
+
+
+                   }
+                   isGPSEnabled == true -> {
+                       val location =
+                           lm?.getLastKnownLocation(LocationManager.GPS_PROVIDER) //GPS 기반으로 위치를 찾음
+                       var getLongitude = location?.longitude!!
+                       var getLatitude = location.latitude
+                       tmpLatitude = getLatitude
+                       tmpLongitude = getLongitude
+                   }
+                   else -> {
+
+                   }
+               }
+               //몇초 간격과 몇미터를 이동했을시에 호출되는 부분 - 주기적으로 위치 업데이트를 하고 싶다면 사용
+               // ****주기적 업데이트를 사용하다가 사용안할시에는 반드시 해제 필요****
+               /*lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                       1000, //몇초
+                       1F,   //몇미터
+                       gpsLocationListener)
+               lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                       1000,
+                       1F,
+                       gpsLocationListener)
+               //해제부분. 상황에 맞게 잘 구현하자
+               lm.removeUpdates(gpsLocationListener)*/
+           }
+           setDaumMapCurrentLocation(tmpLatitude, tmpLongitude, mapView)
 
 
 
@@ -177,53 +189,64 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
         startActivity(intent)
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-
-        when (requestCode) {
-            PERMISSION_REQUEST_CODE -> {  // 1
-                if (grantResults.isEmpty()) {  // 2
-                    throw RuntimeException("Empty permission result")
-                }
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {  // 3
-                    showDialog("Permission granted")
-                } else {
-                    if (shouldShowRequestPermissionRationale(
-                            Manifest.permission.ACCESS_FINE_LOCATION)) { // 4
-                        Log.d(TAG, "User declined, but i can still ask for more")
-                        requestPermissions(
-                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                            PERMISSION_REQUEST_CODE)
-                    } else {
-                        Log.d(TAG, "User declined and i can't ask")
-                        showDialogToGetPermission()   // 5
-                    }
-                }
-            }
+    val gpsLocationListener = object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            val provider: String = location.provider
+            val longitude: Double = location.longitude
+            val latitude: Double = location.latitude
+            val altitude: Double = location.altitude
         }
+
+        //아래 3개함수는 형식상 필수부분
+        override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
+        override fun onProviderEnabled(provider: String) {}
+        override fun onProviderDisabled(provider: String) {}
     }
+//    override fun onRequestPermissionsResult(
+//        requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+//
+//        when (requestCode) {
+//            PERMISSION_REQUEST_CODE -> {  // 1
+//                if (grantResults.isEmpty()) {  // 2
+//                    throw RuntimeException("Empty permission result")
+//                }
+//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {  // 3
+//                    showDialog("Permission granted")
+//                } else {
+//                    if (shouldShowRequestPermissionRationale(
+//                            Manifest.permission.ACCESS_FINE_LOCATION)) { // 4
+//                        Log.d(TAG, "User declined, but i can still ask for more")
+//                        requestPermissions(
+//                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+//                            PERMISSION_REQUEST_CODE)
+//                    } else {
+//                        Log.d(TAG, "User declined and i can't ask")
+//                        showDialogToGetPermission()   // 5
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    private fun showDialogToGetPermission() {
+//        val builder = Builder(this)
+//        builder.setTitle("Permisisons request")
+//            .setMessage("We need the location permission for some reason. " +
+//                    "You need to move on Settings to grant some permissions")
+//
+//        builder.setPositiveButton("OK") { dialogInterface, i ->
+//            val intent = Intent(BassBoost.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", packageName, null))
+//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//            startActivity(intent)   // 6
+//        }
+//        builder.setNegativeButton("Later") { dialogInterface, i ->
+//            // ignore
+//        }
+//        val dialog = builder.create()
+//        dialog.show()
+//    }
 
-    private fun showDialogToGetPermission() {
-        val builder = Builder(this)
-        builder.setTitle("Permisisons request")
-            .setMessage("We need the location permission for some reason. " +
-                    "You need to move on Settings to grant some permissions")
-
-        builder.setPositiveButton("OK") { dialogInterface, i ->
-            val intent = Intent(
-                BassBoost.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                Uri.fromParts("package", packageName, null))
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(intent)   // 6
-        }
-        builder.setNegativeButton("Later") { dialogInterface, i ->
-            // ignore
-        }
-        val dialog = builder.create()
-        dialog.show()
-    }
-
-    fun setDaumMapCurrentLocation(latitude: Double, longitude: Double) {
+    fun setDaumMapCurrentLocation(latitude: Double, longitude: Double, mapView: MapView) {
 
         // 중심점 변경
         mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude), true)
@@ -241,14 +264,14 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
         //mapView.zoomOut(true);
 
         // 마커 생성
-        setDaumMapCurrentMarker()
+        setDaumMapCurrentMarker(mapView)
     }
 
-    fun setDaumMapCurrentMarker() {
+    fun setDaumMapCurrentMarker(mapView: MapView) {
         val marker = MapPOIItem()
         marker.itemName = "현재 위치"
         marker.tag = 0
-        marker.mapPoint = MapPoint.mapPointWithGeoCoord(latitude, longitude)
+        marker.mapPoint = MapPoint.mapPointWithGeoCoord(tmpLatitude, tmpLongitude)
         marker.markerType = MapPOIItem.MarkerType.BluePin // 기본으로 제공하는 BluePin 마커 모양.
         marker.selectedMarkerType =
             MapPOIItem.MarkerType.RedPin // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
