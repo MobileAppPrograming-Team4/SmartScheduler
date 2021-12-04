@@ -114,6 +114,10 @@ class ScheduleInfoAdapter(context: Context) :
                 Toast.makeText(context, "일정을 삭제했습니다", Toast.LENGTH_LONG).show()
                 true
             }
+            R.id.carroute->{
+                this.scheduleClickListener.carroute(position)
+                true
+            }
             else -> false
         }
     }

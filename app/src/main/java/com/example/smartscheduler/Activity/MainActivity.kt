@@ -27,6 +27,7 @@ import com.example.smartscheduler.*
 import com.example.smartscheduler.Database.ScheduleInfo
 import com.example.smartscheduler.Database.ScheduleViewModel
 import com.example.smartscheduler.Decorator.*
+import com.kakao.sdk.common.KakaoSdk
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.CalendarMode
 import java.text.SimpleDateFormat
@@ -267,6 +268,11 @@ class MainActivity : AppCompatActivity() {
             scheduleList = scheduleViewModel.currentData
             goToRoute(scheduleList.value?.get(position)!!, selectedYear!!, selectedMonth!!, selectedDate!!)
         }
+
+        override fun carroute(position: Int){
+            scheduleList = scheduleViewModel.currentData
+            goToCarRoute(scheduleList.value?.get(position)!!, selectedYear!!, selectedMonth!!, selectedDate!!)
+        }
     }
     fun addOrModify(scheduleInfo: ScheduleInfo?, year:Int?, month:Int?, date:Int?){
         val intent = Intent(this, AddScheduleActivity::class.java)
@@ -284,6 +290,11 @@ class MainActivity : AppCompatActivity() {
 
     fun goToRoute(scheduleInfo: ScheduleInfo?, year: Int?, month: Int?, date: Int?) {
         val intent = Intent(this, PublicRouteActivity::class.java)
+        startActivity(intent)
+    }
+
+    fun goToCarRoute(scheduleInfo: ScheduleInfo?, year: Int?, month: Int?, date: Int?) {
+        val intent = Intent(this, CarRoute::class.java)
         startActivity(intent)
     }
 
