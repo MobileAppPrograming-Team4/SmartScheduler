@@ -74,4 +74,5 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation files('libs/libDaumMapAndroid.jar')
     implementation "com.kakao.sdk:v2-navi:2.8.3"
+
 }
