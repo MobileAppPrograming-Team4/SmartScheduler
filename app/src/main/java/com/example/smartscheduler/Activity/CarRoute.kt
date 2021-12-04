@@ -7,6 +7,7 @@ import android.util.Log
 import android.webkit.WebView
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.smartscheduler.R
@@ -24,25 +25,24 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.gson.GsonConverterFactory.*
+import java.util.concurrent.TimeUnit
 
 class CarRoute : AppCompatActivity() {
     lateinit var map: ConstraintLayout
     lateinit var curloc : ImageButton
     lateinit var startNaviBtn : Button
+    lateinit var expectedtime : TextView
+    var RouteInformation : ResultCarRouteSearch? = null
 
     companion object {
         const val BASE_URL_KAKAONAVI_API = "https://apis-navi.kakaomobility.com"
         const val API_KEY = "KakaoAK 28f1a9b662dea4d3296bfaa59f4590b3"
-    }
+    } // 카카오
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         KakaoSdk.init(this, "5f9edbd5b9db541446f51c121146a651")
         setContentView(R.layout.activity_carroute)
-
-
-        //var intent = Intent(this,gps::class.java)
-        startActivity(intent)
 
         val mapView = MapView(this)
         map = findViewById(R.id.clKakaoMapView)
@@ -64,10 +64,12 @@ class CarRoute : AppCompatActivity() {
                 call: Call<ResultCarRouteSearch>,
                 response: Response<ResultCarRouteSearch>
             ) {
+                RouteInformation = response.body()
                 Log.d("결과","성공 : ${response.raw()}")
                 Log.d("결과","성공 : ${response.body()}")
+                expectedtime = findViewById(R.id.expectedtime)
+                expectedtime.setText(expectedtimetoString(RouteInformation!!.routes[0].summary.duration))
             }
-
             override fun onFailure(call: Call<ResultCarRouteSearch>, t: Throwable) {
                 Log.d("결과","실패 : ${t.message}")
             }
@@ -103,5 +105,16 @@ class CarRoute : AppCompatActivity() {
 //                startActivity(intent)
             }
         }
+    }
+
+    //Int형의 에상 소요 시간을 포맷에 맞춰 계산
+    fun expectedtimetoString(intseconds:Int): String {
+        val seconds : Long = intseconds.toLong()
+        val day = TimeUnit.SECONDS.toDays(seconds).toInt()
+        val hours = TimeUnit.SECONDS.toHours(seconds) - day * 24
+        val minute = TimeUnit.SECONDS.toMinutes(seconds) - TimeUnit.SECONDS.toHours(seconds) * 60
+        val second = TimeUnit.SECONDS.toSeconds(seconds) - TimeUnit.SECONDS.toMinutes(seconds) * 60
+        val time = (day.toString() + "일" + hours + "시" + minute + "분" + second + "초")
+        return time
     }
 }

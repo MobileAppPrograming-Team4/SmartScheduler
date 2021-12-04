@@ -181,9 +181,6 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
 
     }
 
-
-
-
     private fun gotoMain(){
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
