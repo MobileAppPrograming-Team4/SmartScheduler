@@ -104,8 +104,6 @@ class CarRoute : AppCompatActivity() {
             }
         }
     }
-
-    //Int형의 에상 소요 시간을 포맷에 맞춰 계산
     fun expectedtimetoString(intseconds:Int): String {
         val seconds : Long = intseconds.toLong()
         val day = TimeUnit.SECONDS.toDays(seconds).toInt()

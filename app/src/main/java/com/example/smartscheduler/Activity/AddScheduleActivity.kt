@@ -25,6 +25,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.CompleteListener {
     lateinit var startTimeTextView: TextView
@@ -34,6 +35,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     lateinit var map: ConstraintLayout
     lateinit var location: EditText
     lateinit var searchButton: ImageButton
+    lateinit var expectedtime1 : TextView
     var startHour = 0
     var startMinute = 0
     var finishHour = 0
@@ -104,6 +106,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 }
                 R.id.car -> {
                     transportType = 1
+                    setCarTime()
                 }
                 R.id.walk -> {
                     transportType = 2
@@ -246,6 +249,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         startMinute = scheduleInfo.scheduleStartMinute
         finishHour = scheduleInfo.scheduleFinishHour
         finishMinute = scheduleInfo.scheduleFinishMinute
+
         when (scheduleInfo.transportation) {
             //0: 대중교통, 1: 자동차, 2: 도보
             0 -> {
@@ -297,5 +301,52 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         )
 
         return totalTime
+    }
+
+    //자동차 예상 소요 시간을 초 단위로 계산후 반환
+    private fun setCarTime(): Int{
+        val BASE_URL_KAKAONAVI_API = "https://apis-navi.kakaomobility.com"
+        val API_KEY = "KakaoAK 28f1a9b662dea4d3296bfaa59f4590b3"
+
+        val origin : String = "128.6112347669226,35.88546795750079" //출발지 좌표
+        val destination : String = "128.61646900942918,35.88790748120179" //목적지 좌표
+
+        val api = kakaonaviAPI.create()
+        val callGetSearchCarRoute = api.getSearchCarRoute(CarRoute.API_KEY,origin,destination)
+
+        var text:String
+        var tmp:Int = 0
+
+        callGetSearchCarRoute.enqueue(object : Callback<ResultCarRouteSearch> {
+            override fun onResponse(
+                call: Call<ResultCarRouteSearch>,
+                response: Response<ResultCarRouteSearch>
+            ) {
+                Log.d("결과","성공 : ${response.raw()}")
+                Log.d("결과","성공 : ${response.body()}")
+                tmp = response.body()!!.routes[0].summary.duration
+                text = expectedtimetoString(tmp)
+
+                expectedtime1 = findViewById(R.id.expectedtime1)
+                expectedtime1.setText(text)
+            }
+            override fun onFailure(call: Call<ResultCarRouteSearch>, t: Throwable) {
+                Log.d("결과","실패 : ${t.message}")
+            }
+        })
+
+        return tmp
+    }
+
+    //Int형의 초 단위 에상 소요 시간을 포맷에 맞춰 계산
+    fun expectedtimetoString(intseconds:Int): String {
+        val seconds : Long = intseconds.toLong()
+        val day = TimeUnit.SECONDS.toDays(seconds).toInt()
+        val hours = TimeUnit.SECONDS.toHours(seconds) - day * 24
+        val minute = TimeUnit.SECONDS.toMinutes(seconds) - TimeUnit.SECONDS.toHours(seconds) * 60
+        val second = TimeUnit.SECONDS.toSeconds(seconds) - TimeUnit.SECONDS.toMinutes(seconds) * 60
+        val time = (day.toString() + "일 " + hours + "시간 " + minute + "분 " + second + "초")
+
+        return time
     }
 }
