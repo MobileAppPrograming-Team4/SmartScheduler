@@ -49,13 +49,10 @@ class CarRoute : AppCompatActivity() {
         curloc = findViewById(R.id.currentLocationButton)
         map.addView(mapView)
 
-        val origin : String = "128.6112347669226,35.88546795750079"
-        val destination : String = "128.61646900942918,35.88790748120179"
 
-//        val retrofit = Retrofit.Builder()
-//            .baseUrl(BASE_URL_KAKAONAVI_API)
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
+        val origin : String = "128.6112347669226,35.88546795750079" //출발지 좌표
+        val destination : String = "128.61646900942918,35.88790748120179" //목적지 좌표
+
         val api = kakaonaviAPI.create()
         val callGetSearchCarRoute = api.getSearchCarRoute(API_KEY,origin,destination)
 
@@ -75,8 +72,10 @@ class CarRoute : AppCompatActivity() {
             }
         })
 
+        //내비게이션 시작 버튼
         startNaviBtn = findViewById(R.id.startNaviBtn)
         startNaviBtn.setOnClickListener {
+            //카카오내비가 설치 되어 있을 경우 앱으로 연결
             if (NaviClient.instance.isKakaoNaviInstalled(this)) {
                 startActivity(
                     NaviClient.instance.navigateIntent(
@@ -86,8 +85,7 @@ class CarRoute : AppCompatActivity() {
                 )
             }
             else {
-                // 웹 브라우저에서 길안내
-                // 카카오내비가 설치되지 않은 곳에서 활용할 수 있습니다.
+                // 카카오내비가 설치되지 않았을 경우 웹에서 연결
                 val uri = NaviClient.instance.navigateWebUrl(
                     Location("카카오 판교오피스", "127.108640", "37.402111"),
                     NaviOption(coordType = CoordType.WGS84),null
@@ -99,7 +97,7 @@ class CarRoute : AppCompatActivity() {
                 // 또는 외부 브라우저
                 //startActivity(Intent(ACTION_VIEW, uri))
 
-                //웹뷰로 앱 내에서 내비 실행
+                //웹뷰로 앱 내에서 내비 실행 -> 웹뷰 스펙 문제로 불가능
 //                var intent = Intent(this, CarNavigation::class.java)
 //                intent.putExtra("uri",uri.toString())
 //                startActivity(intent)
