@@ -23,6 +23,9 @@ data class ScheduleInfo(
     @ColumnInfo(name = "elapsed_time") var elapsedTime: Int?, // 예상이동시간
     @ColumnInfo(name = "alarm_hour") var alarmHour: Int?, //알람 시각(시)
     @ColumnInfo(name = "alarm_minute") var alarmMinute: Int?, //알람 시각(분)
-    @ColumnInfo(name = "set_alarm") var setAlarm: Boolean // 알람설정 여부
+    @ColumnInfo(name = "set_alarm") var setAlarm: Boolean, // 출발 시간 알람설정 여부
+    @ColumnInfo(name = "sleep_alarm_hour") var sleepAlarmHour:Int?, //취침 알람 (시)
+    @ColumnInfo(name = "sleep_alarm_minute") var sleepAlarmMinute: Int?, //취침 알람 (분)
+    @ColumnInfo(name = "set_sleep_alarm") var setSleepAlarm: Boolean // 취침 시간 알람설정 여부
 ):Serializable
 
