@@ -38,7 +38,7 @@ abstract class ScheduleDatabase : RoomDatabase() {
 
         // Migration
         // https://developer.android.com/training/data-storage/room/migrating-db-versions?hl=ko
-        // 출발 알람 시간 추가
+        // 알람 시간 추가
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE 'schedule_database' ADD COLUMN 'alarm_hour' INTEGER")
