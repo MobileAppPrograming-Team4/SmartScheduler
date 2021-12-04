@@ -88,9 +88,6 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
         //2. 저장된 값 불러오기
         var readyTime = userInfo.getInt("readyTime", 0)
         var sleepTime = userInfo.getInt("sleepTime", 0)
-        //출발장소 위도
-        //출발장소 경도
-
 
         if(readyTime>0 && sleepTime>0){
         // 정보를 설정한 적이 있다면 activity_userinfo.xml을 보여주지 않음
@@ -183,6 +180,8 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
             sleepTime = Integer.parseInt(sleepTimeEditText.text.toString())
             editor.putInt("readyTime", readyTime)
             editor.putInt("sleepTime", sleepTime)
+            editor.putFloat("userLatitude", tmpLatitude.toFloat())
+            editor.putFloat("userLongitude", tmpLongitude.toFloat())
             editor.apply()
 
             gotoMain()
