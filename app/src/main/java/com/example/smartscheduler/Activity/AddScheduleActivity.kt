@@ -2,7 +2,6 @@ package com.example.smartscheduler.Activity
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -17,6 +16,7 @@ import com.odsay.odsayandroidsdk.API;
 import com.odsay.odsayandroidsdk.ODsayData;
 import com.odsay.odsayandroidsdk.ODsayService;
 import com.odsay.odsayandroidsdk.OnResultCallbackListener;
+import kotlinx.android.synthetic.main.activity_addschedule.*
 import net.daum.mf.map.api.MapView
 
 import org.json.JSONObject;
@@ -25,14 +25,14 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import android.content.Intent as Intent
 
 class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.CompleteListener {
     lateinit var startTimeTextView: TextView
     lateinit var finishTimeTextView: TextView
+    lateinit var destination: TextView
     lateinit var cal: Calendar
     lateinit var transportGroup: RadioGroup
-    lateinit var map: ConstraintLayout
-    lateinit var location: EditText
     lateinit var searchButton: ImageButton
     var startHour = 0
     var startMinute = 0
@@ -44,6 +44,11 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     var totalTime: Int? = null
     var alarmHour = 0
     var alarmMinute = 0
+    var destName: String? = null
+    var destAddress: String? = null
+    var destRoad: String? = null
+    var destLatitude: Double? = 0.0
+    var destLongitude: Double? = 0.0
 
     lateinit var odsayService: ODsayService
     lateinit var jsonObject: JSONObject
@@ -60,7 +65,6 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
         startTimeTextView = findViewById(R.id.startTimeTextView)
         finishTimeTextView = findViewById(R.id.finishTimeTextView)
-        location = findViewById(R.id.locationString)
         searchButton = findViewById(R.id.locationSearchButton)
 
         var sId: Int = 0
@@ -83,14 +87,21 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             finishMinute = startMinute
         }
 
+//        searchButton.setOnClickListener {
+//            searchKeyword(location.text.toString())
+//            val intent = Intent(this, DestinationSearchActivity::class.java)
+//            intent.putExtra("destination", placeList)
+//        }
+
         searchButton.setOnClickListener {
-            searchKeyword(location.text.toString())
+            val intent = Intent(this, DestinationSearchActivity::class.java)
+            startActivity(intent)
+
+
         }
 
+        setNewDestination()
 
-        val mapView = MapView(this)
-        map = findViewById(R.id.clKakaoMapView)
-        map.addView(mapView)
 
         val scheduleExplain = findViewById<EditText>(R.id.scheduleExplain)
         scheduleTime()
@@ -158,39 +169,12 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 )
                 val intent = Intent()
                 intent.putExtra("scheduleInfo", scheduleInfo)
-                setResult(Activity.RESULT_OK, intent)
+                setResult(RESULT_OK, intent)
                 finish()
             } else {
                 Toast.makeText(this, "일정 내용을 입력해주세요", Toast.LENGTH_LONG).show()
             }
         }
-    }
-
-    //키워드 검색 함
-    private fun searchKeyword(keyword: String) {
-        val retrofit = Retrofit.Builder()   // Retrofit 구성
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val api = retrofit.create(kakaoAPI::class.java)   // 통신 인터페이스를 객체로 생성
-        val call = api.getSearchKeyword(API_KEY, keyword)   // 검색 조건 입력
-
-        // API 서버에 요청
-        call.enqueue(object: Callback<ResultSearchKeyword> {
-            override fun onResponse(
-                call: Call<ResultSearchKeyword>,
-                response: Response<ResultSearchKeyword>
-            ) {
-                // 통신 성공 (검색 결과는 response.body()에 담겨있음)
-                Log.d("Test", "Raw: ${response.raw()}")
-                Log.d("Test", "Body: ${response.body()}")
-            }
-
-            override fun onFailure(call: Call<ResultSearchKeyword>, t: Throwable) {
-                // 통신 실패
-                Log.w("MainActivity", "통신 실패: ${t.message}")
-            }
-        })
     }
 
     override fun setTime(hour: Int, minute: Int, startOrFinish: Int) {
@@ -298,4 +282,21 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
         return totalTime
     }
+
+    private fun setNewDestination() {
+
+        var intent = intent
+        destName = intent.getSerializableExtra("destName").toString()
+        destAddress = intent.getSerializableExtra("destAddress").toString()
+        destRoad = intent.getSerializableExtra("destRoad").toString()
+        destLatitude = intent.getDoubleExtra("destLatitude", 0.0)
+        destLongitude = intent.getDoubleExtra("destLongitude", 0.0)
+
+        destination = findViewById(R.id.locationText)
+        locationText.setText("위치 : " + destName)
+
+        Log.d("newdestination : ", "name : $destName \n address : $destAddress \n road : $destRoad \n lat : $destLatitude \n long : $destLongitude" )
+
+    }
 }
+
