@@ -111,6 +111,9 @@ class MainActivity : AppCompatActivity() {
             goToUserInfo()
         }
 
+        scheduleViewModel.sleepAlarmData.observe(this, {
+            setSleepAlarm(it, this)
+        })
         scheduleViewModel.alarmData.observe(this, {
             setAlarm(it, this)
         })
@@ -124,6 +127,9 @@ class MainActivity : AppCompatActivity() {
         val currentMonth = cal.get(Calendar.MONTH) + 1
         val currentDate = cal.get(Calendar.DATE)
         scheduleViewModel.getAlarm(currentYear, currentMonth, currentDate)
+        //database에서 오늘 취침 알람을 울려야 하는 일정 모두 가져오기
+        cal.add(Calendar.DATE, 1) //내일 날짜
+        scheduleViewModel.getSleepAlarm(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DATE))
     }
 
     //private val M_ALARM_REQUEST_CODE = 1000
@@ -158,14 +164,57 @@ class MainActivity : AppCompatActivity() {
                 context,
                 item.sId,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_CANCEL_CURRENT
             )
 
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                calendar.timeInMillis,
+            alarmManager.setAlarmClock(
+                AlarmManager.AlarmClockInfo(calendar.timeInMillis, alarmIntent),
                 alarmIntent
             )
+        }
+    }
+
+    val SLEEP_ALARM_ID = 3108
+    @TargetApi(Build.VERSION_CODES.M)
+    private fun setSleepAlarm(list: List<ScheduleInfo>, context: Context){
+        for(item in list){
+            val alarmManager: AlarmManager =
+                context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+            //알람이 울릴 시간 설정
+            val calendar = Calendar.getInstance(Locale.KOREA)
+            calendar.set(Calendar.HOUR_OF_DAY, item.sleepAlarmHour!!)
+            calendar.set(Calendar.MINUTE, item.sleepAlarmMinute!!)
+            calendar.set(Calendar.SECOND, 0)
+            Log.d("취침 알람 시간", "${item.sleepAlarmHour}시${item.sleepAlarmMinute}분")
+
+            if (calendar.before(Calendar.getInstance(Locale.KOREA))) {
+                //현재시간보다 빠른 알람은 취소
+                val pendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    SLEEP_ALARM_ID,
+                    intent,
+                    PendingIntent.FLAG_CANCEL_CURRENT
+                )
+                pendingIntent?.cancel()
+                return
+            }
+
+            //SleepAlarmReceiver에 값 전달
+            val intent =
+                Intent(context, SleepAlarmReceiver::class.java) //알람 조건이 충족되었을 때, 리시버로 전달될 인텐트 설정
+            val alarmIntent = PendingIntent.getBroadcast(
+                context,
+                SLEEP_ALARM_ID,
+                intent,
+                PendingIntent.FLAG_CANCEL_CURRENT //PendingIntent가 이미 존재할 경우, 기존 PendingIntent를 cancel하고 다시 생성
+            )
+
+            alarmManager.setAlarmClock(
+                AlarmManager.AlarmClockInfo(calendar.timeInMillis, alarmIntent),
+                alarmIntent
+            )
+            break //취침 알람은 한 번만 울린다
         }
     }
 
