@@ -53,7 +53,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("onCreate","실행")
         super.onCreate(savedInstanceState)
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.activity_main)
         val recyclerView =
             findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recyclerView)
