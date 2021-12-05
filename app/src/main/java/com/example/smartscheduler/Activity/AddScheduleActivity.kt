@@ -102,9 +102,9 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         }
 
 
-        /*val mapView = MapView(this)
+        val mapView = MapView(this)
         map = findViewById(R.id.clKakaoMapView)
-        map.addView(mapView)*/
+        map.addView(mapView)
 
         val scheduleExplain = findViewById<EditText>(R.id.scheduleExplain)
         scheduleTime()

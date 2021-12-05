@@ -25,7 +25,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import net.daum.mf.map.api.MapPOIItem
-import kotlinx.android.synthetic.main.activity_main.*
+//import kotlinx.android.synthetic.main.activity_main.*
 
 
 
@@ -90,10 +90,10 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
             finish()
         }
 
-        /*val mapView = MapView(this)
+        val mapView = MapView(this)
         map = findViewById(R.id.clKakaoMapView)
         curloc = findViewById(R.id.currentLocationButton)
-        map.addView(mapView)*/
+        map.addView(mapView)
 
 
         // 현재위치 클릭
