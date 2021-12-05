@@ -41,7 +41,7 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
     var mapView: MapView? = null
     var tmpLatitude : Double = 0.0
     var tmpLongitude : Double = 0.0
-
+    var locationPermission:Boolean = false
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,6 +52,7 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED) {
             // Permission is granted
+            locationPermission = true
         } else {
             // Permission is not granted
         }
@@ -85,6 +86,7 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
         //출발장소 경도
 
         curloc = findViewById(R.id.currentLocationButton)
+        map = findViewById(R.id.clKakaoMapView)
 
         if(readyTime>0 && sleepTime>0){
         // 정보를 설정한 적이 있다면 activity_userinfo.xml을 보여주지 않음
@@ -93,6 +95,10 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
 
         // 현재위치 클릭
        curloc.setOnClickListener {
+           if(mapView == null){
+               mapView = MapView(this)
+               map!!.addView(mapView)
+           }
            val isGPSEnabled = lm?.isProviderEnabled(LocationManager.GPS_PROVIDER)
            val isNetworkEnabled = lm?.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
            mapView!!.setCurrentLocationEventListener(this)
@@ -176,9 +182,10 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
 
     override fun onResume() {
         super.onResume()
-        mapView = MapView(this)
-        map = findViewById(R.id.clKakaoMapView)
-        map!!.addView(mapView)
+        if(locationPermission) {
+            mapView = MapView(this)
+            map!!.addView(mapView)
+        }
 
     }
 
