@@ -39,6 +39,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var addSchedule: Button
     private lateinit var calendarView: com.prolificinteractive.materialcalendarview.MaterialCalendarView
     private lateinit var settingBt : ImageButton
+    var currentYear: Int? = null  //오늘 년
+    var currentMonth: Int? = null //오늘 월
+    var currentDate: Int? = null  //오늘 일
     var selectedYear: Int? = null
     var selectedMonth: Int? = null
     var selectedDate: Int? = null
@@ -116,19 +119,29 @@ class MainActivity : AppCompatActivity() {
         scheduleViewModel.alarmData.observe(this, {
             setAlarm(it, this)
         })
+        scheduleViewModel.tomorrowAlarmData.observe(this, {
+            setAlarm(it, this)
+        })
         getAlarm()
 
     }
     private fun getAlarm(){
-        //database에서 오늘 알람이 켜져있는 일정 모두 가져오기
         val cal = Calendar.getInstance(Locale.KOREA)
-        val currentYear = cal.get(Calendar.YEAR)
-        val currentMonth = cal.get(Calendar.MONTH) + 1
-        val currentDate = cal.get(Calendar.DATE)
-        scheduleViewModel.getAlarm(currentYear, currentMonth, currentDate)
+        currentYear = cal.get(Calendar.YEAR)
+        currentMonth = cal.get(Calendar.MONTH) + 1
+        currentDate = cal.get(Calendar.DATE)
+        //내일 날짜
+        val today = cal
+        cal.add(Calendar.DATE, 1)
+        val tomorrowYear = today.get(Calendar.YEAR)
+        val tomorrowMonth = today.get(Calendar.MONTH) + 1
+        val tomorrowDate = today.get(Calendar.DATE)
+        //database에서 오늘 알람이 켜져있는 일정 모두 가져오기
+        scheduleViewModel.getAlarm(currentYear!!, currentMonth!!, currentDate!!)
         //database에서 오늘 취침 알람을 울려야 하는 일정 모두 가져오기
-        cal.add(Calendar.DATE, 1) //내일 날짜
-        scheduleViewModel.getSleepAlarm(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DATE))
+        scheduleViewModel.getSleepAlarm(tomorrowYear, tomorrowMonth, tomorrowDate)
+        //database에서 내일 일정이지만 오늘 알람을 울려야 하는 일정 모두 가져오기
+        scheduleViewModel.getTomorrowAlarm(tomorrowYear, tomorrowMonth, tomorrowDate)
     }
 
     //private val M_ALARM_REQUEST_CODE = 1000
@@ -139,6 +152,12 @@ class MainActivity : AppCompatActivity() {
         val calendar = Calendar.getInstance(Locale.KOREA)
 
         for(item in list){
+            if(item.alarmHour!!<0) {
+                // 내일 일정인데 알람은 오늘 울려야 하는 경우
+                // 12월 6일 -1시에 알람이 설정되어 있으면 12월 5일 23시에 알람이 울려야 한다
+                item.alarmHour = item.alarmHour!! + 24
+                Log.d("내일 일정인데","오늘 ${item.alarmHour}시${item.alarmMinute}분에 울릴 예정")
+            }
             //알람이 울릴 시간 설정
             calendar.set(Calendar.HOUR_OF_DAY, item.alarmHour!!)
             calendar.set(Calendar.MINUTE, item.alarmMinute!!)

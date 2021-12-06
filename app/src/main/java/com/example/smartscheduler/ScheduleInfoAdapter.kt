@@ -67,7 +67,11 @@ class ScheduleInfoAdapter(context: Context) :
         viewHolder.start_finish_time.text = "${schedule.scheduleStartHour}:${schedule.scheduleStartMinute} ~ ${schedule.scheduleFinishHour}:${schedule.scheduleFinishMinute}"
         if (schedule.setAlarm) {
             viewHolder.alarmOn.setColorFilter(alarmOnColor, PorterDuff.Mode.SRC_IN)
-            viewHolder.alarm_hour_minute.text = "${schedule.alarmHour}:${schedule.alarmMinute}"
+            if(schedule.alarmHour!! < 0){
+                viewHolder.alarm_hour_minute.text = "하루 전 ${schedule.alarmHour!! +24}:${schedule.alarmMinute}"
+            }else {
+                viewHolder.alarm_hour_minute.text = "${schedule.alarmHour}:${schedule.alarmMinute}"
+            }
         } else {
             viewHolder.alarmOn.setColorFilter(null)
             viewHolder.alarm_hour_minute.text = "OFF"
