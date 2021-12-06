@@ -281,22 +281,6 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         return totalTime
     }
 
-    private fun setNewDestination() {
-
-        var intent = intent
-        destName = intent.getSerializableExtra("destName").toString()
-        destAddress = intent.getSerializableExtra("destAddress").toString()
-        destRoad = intent.getSerializableExtra("destRoad").toString()
-        destLatitude = intent.getDoubleExtra("destLatitude", 0.0)
-        destLongitude = intent.getDoubleExtra("destLongitude", 0.0)
-
-        destination = findViewById(R.id.locationText)
-        locationText.setText("위치 : " + destName)
-
-        Log.d("newdestination : ", "name : $destName \n address : $destAddress \n road : $destRoad \n lat : $destLatitude \n long : $destLongitude" )
-
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
