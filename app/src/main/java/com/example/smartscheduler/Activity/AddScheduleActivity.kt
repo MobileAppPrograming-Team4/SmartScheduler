@@ -274,7 +274,10 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     }
 
     private fun setPublicTime(): Unit {
-        // var totalTime: Int = -1
+        val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
+
+        val depX = userInfo.getString("userLongitude","")
+        val depY = userInfo.getString("userLatitude","")
 
         odsayService = ODsayService.init(
             this,
@@ -284,10 +287,10 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         odsayService.setReadTimeout(5000)
 
         odsayService.requestSearchPubTransPath(
-            "128.61027824041773",
-            "35.88902720456651",
-            "128.6017393692533",
-            "35.87155237703856",
+            depX.toString(),
+            depY.toString(),
+            destLongitude.toString(),
+            destLatitude.toString(),
             null,
             null,
             null,
@@ -318,19 +321,24 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     private fun setWalkTime(): Unit {
         println("얘도 괜찮?")
 
+        val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
+
+        val depX = userInfo.getString("userLongitude","")
+        val depY = userInfo.getString("userLatitude","")
+
         /*
         val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
 
         var url = "https://apis.openapi.sk.com/tmap/routes/pedestrian?"
         val client = OkHttpClient()
 
-        url += "startX=128.61027824041773"
-        url += "&startY=35.88902720456651"
-        url += "&endX=128.6119321645856"
-        url += "&endY=35.89113011991111"
+        url += "startX=" + depX
+        url += "&startY=" + depY
+        url += "&endX=" + destLongitude.toString()
+        url += "&endY=" + destLatitude.toString()
         url += "&reqCoordType=WGS84GEO"
-        url += "&startName=" + URLEncoder.encode("경북대학교 테니스장", "UTF-8")
-        url += "&endName=" + URLEncoder.encode("경북대학교 중앙도서관", "UTF-8")
+        url += "&startName=" + URLEncoder.encode("출발", "UTF-8")
+        url += "&endName=" + URLEncoder.encode("도착", "UTF-8")
         url += "&searchOption=0&resCoordType=WGS84GEO"
 
         val request = Request.Builder()

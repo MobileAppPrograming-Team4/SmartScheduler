@@ -39,8 +39,8 @@ class WalkRouteActivity : AppCompatActivity() {
         val arriY = getIntent.getDoubleExtra("y", 0.0)
 
         val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
-        val depX = userInfo.getString("userLongitude", null)
-        val depY = userInfo.getString("userLatitude", null)
+        val depX = userInfo.getString("userLongitude", "")
+        val depY = userInfo.getString("userLatitude", "")
 
         totalTime = findViewById<TextView>(R.id.walkTime)
         totalDistance = findViewById<TextView>(R.id.walkLength)
