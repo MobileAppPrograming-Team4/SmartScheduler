@@ -1,5 +1,6 @@
 package com.example.smartscheduler.Activity
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -102,12 +103,14 @@ class DestinationSearchActivity : AppCompatActivity() {
 
         //입력 버튼
         confirmButton.setOnClickListener {
-            val intent = Intent(this, AddScheduleActivity::class.java)
-            intent.putExtra("destName", destName)
-            intent.putExtra("destAddress", destName)
-            intent.putExtra("destName", destName)
-            intent.putExtra("destLatitude", destLatitude)
-            intent.putExtra("destLongitude", destLongitude)
+            var outintent = Intent(applicationContext, AddScheduleActivity::class.java)
+            outintent.putExtra("destName", destName)
+            outintent.putExtra("destAddress", destName)
+            outintent.putExtra("destName", destName)
+            outintent.putExtra("destLatitude", destLatitude)
+            outintent.putExtra("destLongitude", destLongitude)
+            Log.d("newdestination : ", "name : $destName \n address : $destAddress \n road : $destRoad \n lat : $destLatitude \n long : $destLongitude" )
+            setResult(Activity.RESULT_OK, outintent)
             finish()
         }
 

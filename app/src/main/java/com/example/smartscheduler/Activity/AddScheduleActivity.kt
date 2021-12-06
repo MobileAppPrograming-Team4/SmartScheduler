@@ -109,7 +109,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
         searchButton.setOnClickListener {
             val intent = Intent(this, DestinationSearchActivity::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, 0)
 
 
         }
@@ -309,6 +309,22 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         return totalTime
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            destName = data!!.getStringExtra("destName")
+            destAddress = data!!.getStringExtra("destAddress")
+            destRoad = data!!.getStringExtra("destRoad")
+            destLatitude = data!!.getDoubleExtra("destLatitude", 0.0)
+            destLongitude = data!!.getDoubleExtra("destLongitude", 0.0)
+            locationText.setText("위치 : " + destName)
+            Log.d(
+                "newdestination : ",
+                "받은 로그 name : $destName \n address : $destAddress \n road : $destRoad \n lat : $destLatitude \n long : $destLongitude"
+            )
+        }
+    }
+
     private fun calculateAlarmClock(elapsedTime:Int){
         //알람 시간(나갈 준비를 해야 하는 시간)을 계산: 일정 시작 시간 - 이동 소요 시간 - 외출 준비 시간
         //elapsedTime ; 출발 ~ 도착지 소요시간(단위 : 분)
@@ -333,11 +349,11 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
         // 외출준비 알람이 울리는 시간 - 수면시간이 선택한 날의 이전일 경우 취침 알람을 킴
         // 예시: 12월 3일에 외출준비 시간 알람이 7시에 울려야 하고, 수면 시간이 8시간일 때, 12월 2일 23시에 취침 시간을 알려줌
-        if(alarmHour - sleepTime < 0){
-            // 취침 알람 시간 계산
-            sleepAlarmHour = alarmHour - sleepTime + 24
-            sleepAlarmMinute = alarmMinute
-            isSleepAlarmOn = true
-        }
+            if(alarmHour - sleepTime < 0){
+                // 취침 알람 시간 계산
+                sleepAlarmHour = alarmHour - sleepTime + 24
+                sleepAlarmMinute = alarmMinute
+                isSleepAlarmOn = true
+            }
     }
 }
