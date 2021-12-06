@@ -6,8 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationListener
+import android.location.*
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -24,22 +23,28 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.LatLng
 import net.daum.mf.map.api.MapPOIItem
 import kotlinx.android.synthetic.main.activity_main.*
-
-
+import java.util.*
 
 
 class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListener, MapView.MapViewEventListener {
 
+    lateinit var fusedLocationClient: FusedLocationProviderClient
     lateinit var readyTimeEditText: EditText
     lateinit var sleepTimeEditText: EditText
     lateinit var saveButton: Button
-    lateinit var map: ConstraintLayout
     lateinit var curloc : ImageButton
+    lateinit var addressText : TextView
 
+    var map: ConstraintLayout? = null
+    var mapView: MapView? = null
     var tmpLatitude : Double = 0.0
     var tmpLongitude : Double = 0.0
+    var locationPermission:Boolean = false
 
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -47,12 +52,19 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_userinfo)
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED) {
             // Permission is granted
+            locationPermission = true
         } else {
             // Permission is not granted
+        }
+
+        if (Build.VERSION.SDK_INT >= 23 &&
+            ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 0)
         }
 
         var lm: LocationManager? = getSystemService(Context.LOCATION_SERVICE) as LocationManager?
@@ -83,27 +95,26 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
         //출발장소 위도
         //출발장소 경도
 
+        curloc = findViewById(R.id.currentLocationButton)
+        map = findViewById(R.id.clKakaoMapView)
 
         if(readyTime>0 && sleepTime>0){
         // 정보를 설정한 적이 있다면 activity_userinfo.xml을 보여주지 않음
             gotoMain()
-            finish()
         }
-
-        val mapView = MapView(this)
-        map = findViewById(R.id.clKakaoMapView)
-        curloc = findViewById(R.id.currentLocationButton)
-        map.addView(mapView)
-
 
         // 현재위치 클릭
        curloc.setOnClickListener {
+           if(mapView == null){
+               mapView = MapView(this)
+               map!!.addView(mapView)
+           }
            val isGPSEnabled = lm?.isProviderEnabled(LocationManager.GPS_PROVIDER)
            val isNetworkEnabled = lm?.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-           mapView.setCurrentLocationEventListener(this)
+           mapView!!.setCurrentLocationEventListener(this)
 //           mapView.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading
-           //lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, gpsListener)
-           //lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100, 1, gpsListener)
+                //lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, gpsListener)
+                //lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100, 1, gpsListener)
 //           Log.d(
 //               "Test", "GPS Location changed, Latitude: $latitude" +
 //                       ", Longitude: $longitude" + ", isGPSEnabled: $isGPSEnabled" + ", isNetworkEnabled: $isNetworkEnabled"
@@ -113,7 +124,8 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
            if (Build.VERSION.SDK_INT >= 23 &&
                ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 0)
-           } else {
+           }
+           else {
                when { //프로바이더 제공자 활성화 여부 체크
                    isNetworkEnabled == true -> {
                        val location = lm?.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) //인터넷기반으로 위치를 찾음
@@ -149,8 +161,9 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
                //해제부분. 상황에 맞게 잘 구현하자
                lm.removeUpdates(gpsLocationListener)*/
            }
-           setDaumMapCurrentLocation(tmpLatitude, tmpLongitude, mapView)
 
+           setDaumMapCurrentLocation(tmpLatitude, tmpLongitude, mapView!!)
+           getAddress(tmpLatitude, tmpLongitude)
 
 
 
@@ -173,6 +186,8 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
             sleepTime = Integer.parseInt(sleepTimeEditText.text.toString())
             editor.putInt("readyTime", readyTime)
             editor.putInt("sleepTime", sleepTime)
+            editor.putFloat("userLatitude", tmpLatitude.toFloat())
+            editor.putFloat("userLongitude", tmpLongitude.toFloat())
             editor.apply()
 
             gotoMain()
@@ -181,9 +196,32 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        if(locationPermission) {
+            mapView = MapView(this)
+            map!!.addView(mapView)
+        }
+
+    }
+
+    override fun finish(){
+        map?.removeView(mapView)
+        super.finish()
+    }
+
     private fun gotoMain(){
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
+        finish()
+    }
+
+    private fun getAddress(latitude: Double, longitude: Double) {
+        val geoCoder = Geocoder(this@UserInfoActivity, Locale.getDefault())
+        val address = geoCoder.getFromLocation(latitude, longitude, 1).first().getAddressLine(0)
+        addressText = findViewById(R.id.addressText)
+        addressText.setText("주소 : " + address)
+        Log.e("Address", address)
     }
 
     val gpsLocationListener = object : LocationListener {
@@ -330,6 +368,11 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
 
 }
 
+private fun Geocoder.getFromLocation(tmpLatitude: Double, tmpLongitude: Double) {
+
+}
+
 private fun LocationManager?.requestLocationUpdates(gpsProvider: String, i: Int, i1: Int, gpsListener: LocationListener) {
 
 }
+
