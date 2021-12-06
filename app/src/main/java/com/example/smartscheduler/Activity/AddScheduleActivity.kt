@@ -22,10 +22,10 @@ import com.example.smartscheduler.*
 import com.example.smartscheduler.Database.ScheduleInfo
 import java.util.*
 
-import com.odsay.odsayandroidsdk.API;
-import com.odsay.odsayandroidsdk.ODsayData;
-import com.odsay.odsayandroidsdk.ODsayService;
-import com.odsay.odsayandroidsdk.OnResultCallbackListener;
+import com.odsay.odsayandroidsdk.API
+import com.odsay.odsayandroidsdk.ODsayData
+import com.odsay.odsayandroidsdk.ODsayService
+import com.odsay.odsayandroidsdk.OnResultCallbackListener
 import kotlinx.android.synthetic.main.activity_addschedule.*
 import net.daum.mf.map.api.MapView
 
@@ -36,7 +36,7 @@ import java.net.URLEncoder
 import java.io.IOException
 
 import org.json.JSONArray
-import org.json.JSONObject;
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -125,10 +125,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         searchButton.setOnClickListener {
             val intent = Intent(this, DestinationSearchActivity::class.java)
             startActivityForResult(intent, 0)
-
-
         }
-
 
         val scheduleExplain = findViewById<EditText>(R.id.scheduleExplain)
         scheduleTime()
@@ -139,7 +136,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             when (checkedId) {
                 R.id.publicTransport -> {
                     transportType = 0
-                    totalTime = setPublicTime()
+                    setPublicTime()
                 }
                 R.id.car -> {
                     transportType = 1
@@ -147,20 +144,13 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 }
                 R.id.walk -> {
                     transportType = 2
-                    totalTime = setWalkTime()
+                    setWalkTime()
                 }
                 else -> {
                     transportType = null
                 }
             }
         }
-
-        /*when (transportType) {
-            0 -> totalTime = setPublicTime()
-            1 -> totalTime = 10
-            2 -> totalTime = 10
-            else -> totalTime = 0
-        }*/
 
         /* place Information */
         var isAlarmOn: Boolean = true
@@ -173,10 +163,10 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         findViewById<Button>(R.id.saveButton).setOnClickListener {
             // 저장하기 버튼을 누르면
             // 1. 소요시간 계산
-            totalTime = when (transportType) {
+            when (transportType) {
                 0 -> setPublicTime()
-                1 -> 10
-                2 -> 10
+                1 -> totalTime = 10
+                2 -> setWalkTime()
                 else -> 0
             }
             // 2. 출발 알람이 켜져있으면 알람이 울릴 시간 계산
@@ -281,8 +271,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         scheduleInfo.transportation = null
     }
 
-    private fun setPublicTime(): Int {
-        var totalTime: Int = -1
+    private fun setPublicTime(): Unit {
+        // var totalTime: Int = -1
 
         odsayService = ODsayService.init(
             this,
@@ -309,6 +299,9 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                     val pathInfo = firstPath.getJSONObject("info")
 
                     totalTime = pathInfo.getInt("totalTime")
+
+                    expectedtime1 = findViewById(R.id.expectedtime1)
+                    expectedtime1.setText(totalTime.toString() + "분")
                 }
 
                 override fun onError(code: Int, message: String, api: API) {
@@ -317,13 +310,13 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             }
         )
 
-        return totalTime
+        // return totalTime
     }
 
-    private fun setWalkTime(): Int {
+    private fun setWalkTime(): Unit {
         println("얘도 괜찮?")
-        var totalTime = 0
 
+        /*
         val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
 
         var url = "https://apis.openapi.sk.com/tmap/routes/pedestrian?"
@@ -345,29 +338,30 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             .url(url)
             .build()
 
-        var myHandler = Handler()
-
         val response = client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
             }
             override fun onResponse(call: Call, response: Response) {
-                Thread {
-                    val data = response.body?.string()
+                val data = response.body?.string()
 
-                    val jsonObj = JSONObject(data)
-                    val featureArray = jsonObj.getJSONArray("features")
-                    val firstFeature = featureArray.getJSONObject(0)
-                    val property = firstFeature.getJSONObject("properties")
-                    val walkTime = (property.getInt("totalTime") / 60) + 1
+                val jsonObj = JSONObject(data)
+                val featureArray = jsonObj.getJSONArray("features")
+                val firstFeature = featureArray.getJSONObject(0)
+                val property = firstFeature.getJSONObject("properties")
+                val walkTime = (property.getInt("totalTime") / 60) + 1
 
-                    myHandler.post {
-                        totalTime = walkTime
-                    }
-                }.start()
+                totalTime = walkTime
+
+                expectedtime1 = findViewById(R.id.expectedtime1)
+                expectedtime1.setText(totalTime.toString() + "분")
             }
         })
-        return totalTime
+         */
+
+        expectedtime1 = findViewById(R.id.expectedtime1)
+        expectedtime1.setText(totalTime.toString() + "분")
+        totalTime = 7
     }
 
     //자동차 예상 소요 시간을 초 단위로 계산후 반환
