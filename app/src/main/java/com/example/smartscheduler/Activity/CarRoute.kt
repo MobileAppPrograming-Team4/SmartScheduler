@@ -15,47 +15,54 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.smartscheduler.R
 import com.kakao.sdk.navi.NaviClient
 import com.kakao.sdk.navi.model.*
-import com.kakao.sdk.*
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.util.KakaoCustomTabsClient
 import com.kakao.sdk.navi.model.Location
-import com.odsay.odsayandroidsdk.API
+import net.daum.mf.map.api.MapPOIItem
+import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.converter.gson.GsonConverterFactory.*
-import java.util.concurrent.TimeUnit
+
 
 class CarRoute : AppCompatActivity() {
     lateinit var map: ConstraintLayout
-    lateinit var curloc : ImageButton
     lateinit var startNaviBtn : Button
-    lateinit var expectedtime : TextView
-    var RouteInformation : ResultCarRouteSearch? = null
+    lateinit var destBtn : ImageButton
 
     companion object {
         const val BASE_URL_KAKAONAVI_API = "https://apis-navi.kakaomobility.com"
         const val API_KEY = "KakaoAK 28f1a9b662dea4d3296bfaa59f4590b3"
     } // 카카오
 
+    var destx : Double = 0.0
+    var desty : Double = 0.0
+
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
+
         KakaoSdk.init(this, "5f9edbd5b9db541446f51c121146a651")
         setContentView(R.layout.activity_carroute)
 
+        val getIntent = getIntent()
+        val destx = getIntent.getDoubleExtra("x",0.0)
+        val desty = getIntent.getDoubleExtra("y",0.0)
+        //val destname = getIntent.getStringExtra("destname")
+        val destname = "약속장소"
+        Log.d("x좌표","$destx")
+        Log.d("y좌표","$desty")
+        Log.d("장소 이름","$destname")
+
         val mapView = MapView(this)
         map = findViewById(R.id.clKakaoMapView)
-        curloc = findViewById(R.id.currentLocationButton)
         map.addView(mapView)
 
-        val destInfo: SharedPreferences = getSharedPreferences("destInfo", Activity.MODE_PRIVATE)
+        setDaumMapDestLocation(desty,destx,mapView!!)
 
-        val destx = destInfo.getString("destx","")
-        val desty = destInfo.getString("desty","")//출발지 경도
-        val destname = destInfo.getString("destname","")
+
+        destBtn = findViewById(R.id.DestinationButton)
+        destBtn.setOnClickListener{
+            setDaumMapDestLocation(desty,destx,mapView!!)
+        }
+
 
         //내비게이션 시작 버튼
         startNaviBtn = findViewById(R.id.startNaviBtn)
@@ -64,7 +71,7 @@ class CarRoute : AppCompatActivity() {
             if (NaviClient.instance.isKakaoNaviInstalled(this)) {
                 startActivity(
                     NaviClient.instance.navigateIntent(
-                        Location(name=destname!!,x=destx!!,y=desty!!),
+                        Location(name=destname!!,x=destx!!.toString(),y=desty!!.toString()),
                         NaviOption(coordType = CoordType.WGS84,vehicleType = VehicleType.FIRST, rpOption = RpOption.RECOMMENDED)
                     )
                 )
@@ -72,7 +79,7 @@ class CarRoute : AppCompatActivity() {
             else {
                 // 카카오내비가 설치되지 않았을 경우 웹에서 연결
                 val uri = NaviClient.instance.navigateWebUrl(
-                    Location(name=destname!!,x=destx!!,y=desty!!),
+                    Location(name=destname!!,x=destx!!.toString(),y=desty!!.toString()),
                     NaviOption(coordType = CoordType.WGS84),null
                 )
 
@@ -90,13 +97,28 @@ class CarRoute : AppCompatActivity() {
         }
     }
 
-    fun expectedtimetoString(intseconds:Int): String {
-        val seconds : Long = intseconds.toLong()
-        val day = TimeUnit.SECONDS.toDays(seconds).toInt()
-        val hours = TimeUnit.SECONDS.toHours(seconds) - day * 24
-        val minute = TimeUnit.SECONDS.toMinutes(seconds) - TimeUnit.SECONDS.toHours(seconds) * 60
-        val second = TimeUnit.SECONDS.toSeconds(seconds) - TimeUnit.SECONDS.toMinutes(seconds) * 60
-        val time = (day.toString() + "일" + hours + "시" + minute + "분" + second + "초")
-        return time
+    fun setDaumMapDestLocation(latitude: Double, longitude: Double, mapView: MapView) {
+
+        // 중심점 변경
+        mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude), true)
+
+        // 줌 레벨 변경
+        mapView.setZoomLevel(4, true)
+
+        // 줌 인
+        mapView.zoomIn(true)
+
+        // 마커 생성
+        setDaumMapDestMarker(mapView)
+    }
+
+    fun setDaumMapDestMarker(mapView: MapView) {
+        val marker = MapPOIItem()
+        marker.itemName = "약속장소"
+        marker.tag = 0
+        marker.mapPoint = MapPoint.mapPointWithGeoCoord(desty,destx)
+        marker.markerType = MapPOIItem.MarkerType.BluePin // 기본으로 제공하는 BluePin 마커 모양.
+        marker.selectedMarkerType = MapPOIItem.MarkerType.RedPin // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
+        mapView.addPOIItem(marker)
     }
 }

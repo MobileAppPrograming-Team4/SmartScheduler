@@ -360,12 +360,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun goToRoute(scheduleInfo: ScheduleInfo?, year: Int?, month: Int?, date: Int?) {
-        val intent = Intent(this, PublicRouteActivity::class.java)
+        val intent = Intent(this, CarRoute::class.java)
         startActivity(intent)
     }
 
     fun goToCarRoute(scheduleInfo: ScheduleInfo?, year: Int?, month: Int?, date: Int?) {
         val intent = Intent(this, CarRoute::class.java)
+        intent.putExtra("x",scheduleInfo!!.schedulePlace_x_double)
+        intent.putExtra("y",scheduleInfo!!.schedulePlace_y_double)
+        //intent.putExtra("destname",scheduleInfo!!.schedulePlace_name)
         startActivity(intent)
     }
 
