@@ -99,6 +99,10 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             startMinute = cal.get(Calendar.MINUTE)
             finishHour = startHour + 1
             finishMinute = startMinute
+            if(finishHour>=24){
+                finishHour = 23
+                finishMinute = 59
+            }
         }
 
 //        searchButton.setOnClickListener {
@@ -210,6 +214,10 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             startMinute = minute
             finishHour = hour + 1
             finishMinute = minute
+            if(finishHour>=24){
+                finishHour = 23
+                finishMinute = 59
+            }
             startTimeTextView.text = showTimeTextView(month, date, startHour, startMinute)
             finishTimeTextView.text = showTimeTextView(month, date, finishHour, finishMinute)
         } else if (startOrFinish == 1) { //종료 시각 설정
@@ -256,18 +264,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         startMinute = scheduleInfo.scheduleStartMinute
         finishHour = scheduleInfo.scheduleFinishHour
         finishMinute = scheduleInfo.scheduleFinishMinute
-        when (scheduleInfo.transportation) {
-            //0: 대중교통, 1: 자동차, 2: 도보
-            0 -> {
-                findViewById<RadioButton>(R.id.publicTransport).isChecked = true
-            }
-            1 -> {
-                findViewById<RadioButton>(R.id.car).isChecked = true
-            }
-            2 -> {
-                findViewById<RadioButton>(R.id.walk).isChecked = true
-            }
-        }
+        scheduleInfo.transportation = null
     }
 
     private fun setPublicTime(): Int {
@@ -345,7 +342,6 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             alarmMinute += 60
             alarmHour -= 1
         }
-        if(alarmHour<0)
 
         // 외출준비 알람이 울리는 시간 - 수면시간이 선택한 날의 이전일 경우 취침 알람을 킴
         // 예시: 12월 3일에 외출준비 시간 알람이 7시에 울려야 하고, 수면 시간이 8시간일 때, 12월 2일 23시에 취침 시간을 알려줌
@@ -353,6 +349,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 // 취침 알람 시간 계산
                 sleepAlarmHour = alarmHour - sleepTime + 24
                 sleepAlarmMinute = alarmMinute
+                Log.d("취침 알람","${sleepAlarmHour}:${sleepAlarmMinute}")
                 isSleepAlarmOn = true
             }
     }

@@ -64,7 +64,7 @@ class ScheduleInfoAdapter(context: Context) :
             showPopup(v, position)
         }
         val schedule = scheduleList[position]
-        viewHolder.start_finish_time.text = "${schedule.scheduleStartHour}:${schedule.scheduleStartMinute} ~ ${schedule.scheduleFinishHour}:${schedule.scheduleStartMinute}"
+        viewHolder.start_finish_time.text = "${schedule.scheduleStartHour}:${schedule.scheduleStartMinute} ~ ${schedule.scheduleFinishHour}:${schedule.scheduleFinishMinute}"
         if (schedule.setAlarm) {
             viewHolder.alarmOn.setColorFilter(alarmOnColor, PorterDuff.Mode.SRC_IN)
             viewHolder.alarm_hour_minute.text = "${schedule.alarmHour}:${schedule.alarmMinute}"

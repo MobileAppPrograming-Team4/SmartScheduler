@@ -20,7 +20,7 @@ import com.example.smartscheduler.Database.ScheduleInfo
 class AlarmReceiver : BroadcastReceiver() {
     // https://reakwon.tistory.com/m/184
     // https://hanyeop.tistory.com/217
-
+    lateinit var info:ScheduleInfo
     companion object {
         /* 아이디 선언 */
         const val NOTIFICATION_CHANNEL_ID = "1000"
@@ -28,6 +28,10 @@ class AlarmReceiver : BroadcastReceiver() {
     }
     /* onReceive: 알람 시간이 되었을 때 동작 */
     override fun onReceive(context: Context, intent: Intent) {
+        val bundle = intent.getBundleExtra("bundle")
+        if(bundle != null){
+            info = bundle.getSerializable("alarmInfo") as ScheduleInfo
+        }
         createNotificationChannel(context)
         notifyNotification(context)
     }
@@ -39,7 +43,6 @@ class AlarmReceiver : BroadcastReceiver() {
                 "준비 알람", //채널의 이름
                 NotificationManager.IMPORTANCE_HIGH //IMPORTANCE_HIGH: 알림음이 울리고 헤드업 알림으로 표시
             )
-            notificationChannel.lightColor = Color.RED //색상
 
             NotificationManagerCompat.from(context)
                 .createNotificationChannel(notificationChannel)
@@ -57,8 +60,9 @@ class AlarmReceiver : BroadcastReceiver() {
             )
 
             val build = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-                .setContentTitle("알람") //제목
-                .setContentText("다음 일정을 준비할 시간입니다") //내용
+                .setContentTitle("'${info.scheduleExplain}'을 준비할 시간입니다") //제목
+                .setContentText("${info.scheduleStartHour}:${info.scheduleStartMinute}~${info.scheduleFinishHour}:${info.scheduleFinishMinute}" +
+                        " 이동 시간 ${info.elapsedTime} 분 예상") //내용
                 .setContentIntent(contentPendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setSmallIcon(R.drawable.ic_baseline_alarm_on_24) //아이콘

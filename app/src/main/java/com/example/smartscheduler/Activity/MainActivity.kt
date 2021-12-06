@@ -158,6 +158,10 @@ class MainActivity : AppCompatActivity() {
                 pendingIntent?.cancel()
                 continue
             }
+            // pendingIntent로 AlarmReceiver에 알람 정보를 알려줌
+            val bundle = Bundle()
+            bundle.putSerializable("alarmInfo",item)
+            intent.putExtra("bundle", bundle)
 
             val alarmIntent = PendingIntent.getBroadcast(
                 context,
