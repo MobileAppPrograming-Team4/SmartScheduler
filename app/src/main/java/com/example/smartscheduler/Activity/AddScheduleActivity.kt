@@ -106,8 +106,6 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         searchButton.setOnClickListener {
             val intent = Intent(this, DestinationSearchActivity::class.java)
             startActivityForResult(intent, 0)
-
-
         }
 
 
@@ -125,7 +123,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                     transportType = 1
                     carRadioButton = findViewById(R.id.car)
                     carRadioButton.setOnClickListener{
-                        setCarTime()
+                        setCarTime()        //자동차 선택시 예상소요시간에 시간출력
                     }
                 }
                 R.id.walk -> {
@@ -304,7 +302,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         return totalTime
     }
 
-    //자동차 예상 소요 시간을 초 단위로 계산후 반환
+    //자동차 예상 소요 시간을 계산 후, 초 단위로 duration에 저장, 리턴
     private fun setCarTime(): Int{
         val BASE_URL_KAKAONAVI_API = "https://apis-navi.kakaomobility.com"
         val API_KEY = "KakaoAK 28f1a9b662dea4d3296bfaa59f4590b3"
@@ -352,7 +350,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 Log.d("결과","성공 : ${response.body()}")
                 duration = response.body()!!.routes[0].summary.duration
                 expectedtime1.setText(expectedtimetoString(response.body()!!.routes[0].summary.duration))
-                //duration - 예상 소요시간을 초단위로 받아오기때문에 출력에 적합한 포맷으로 바꾼후
+                //duration(예상소요시간)을 초단위로 받아오기때문에 출력에 적합한 포맷으로 바꾼 후 텍스트뷰에 넣음
 
             }
             override fun onFailure(call: Call<ResultCarRouteSearch>, t: Throwable) {
