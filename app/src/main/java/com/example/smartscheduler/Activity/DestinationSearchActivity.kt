@@ -74,8 +74,8 @@ class DestinationSearchActivity : AppCompatActivity() {
                 destName = listItems[position].name
                 destAddress = listItems[position].address
                 destRoad = listItems[position].road
-                destLatitude = listItems[position].x
-                destLongitude = listItems[position].y
+                destLatitude = listItems[position].y
+                destLongitude = listItems[position].x
 
             }
         })

@@ -164,6 +164,7 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
 
            setDaumMapCurrentLocation(tmpLatitude, tmpLongitude, mapView!!)
            getAddress(tmpLatitude, tmpLongitude)
+           Log.d("위도 경도","$tmpLongitude $tmpLatitude")
 
 
 
@@ -186,8 +187,8 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
             sleepTime = Integer.parseInt(sleepTimeEditText.text.toString())
             editor.putInt("readyTime", readyTime)
             editor.putInt("sleepTime", sleepTime)
-            editor.putFloat("userLatitude", tmpLatitude.toFloat())
-            editor.putFloat("userLongitude", tmpLongitude.toFloat())
+            editor.putString("userLatitude", tmpLatitude.toString())
+            editor.putString("userLongitude", tmpLongitude.toString())
             editor.apply()
 
             gotoMain()
