@@ -17,6 +17,7 @@ import com.example.smartscheduler.R
 import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
 import android.widget.TextView
+import android.location.LocationManager
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -36,12 +37,14 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
     lateinit var readyTimeEditText: EditText
     lateinit var sleepTimeEditText: EditText
     lateinit var saveButton: Button
-    lateinit var map: ConstraintLayout
     lateinit var curloc : ImageButton
     lateinit var addressText : TextView
+
+    var map: ConstraintLayout? = null
+    var mapView: MapView? = null
     var tmpLatitude : Double = 0.0
     var tmpLongitude : Double = 0.0
-
+    var locationPermission:Boolean = false
 
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -54,6 +57,7 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED) {
             // Permission is granted
+            locationPermission = true
         } else {
             // Permission is not granted
         }
@@ -88,27 +92,29 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
         //2. 저장된 값 불러오기
         var readyTime = userInfo.getInt("readyTime", 0)
         var sleepTime = userInfo.getInt("sleepTime", 0)
+        //출발장소 위도
+        //출발장소 경도
+
+        curloc = findViewById(R.id.currentLocationButton)
+        map = findViewById(R.id.clKakaoMapView)
 
         if(readyTime>0 && sleepTime>0){
         // 정보를 설정한 적이 있다면 activity_userinfo.xml을 보여주지 않음
             gotoMain()
-            finish()
         }
-
-        val mapView = MapView(this)
-        map = findViewById(R.id.clKakaoMapView)
-        curloc = findViewById(R.id.currentLocationButton)
-        map.addView(mapView)
-
 
         // 현재위치 클릭
        curloc.setOnClickListener {
+           if(mapView == null){
+               mapView = MapView(this)
+               map!!.addView(mapView)
+           }
            val isGPSEnabled = lm?.isProviderEnabled(LocationManager.GPS_PROVIDER)
            val isNetworkEnabled = lm?.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-           mapView.setCurrentLocationEventListener(this)
+           mapView!!.setCurrentLocationEventListener(this)
 //           mapView.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading
-           //lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, gpsListener)
-           //lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100, 1, gpsListener)
+                //lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, gpsListener)
+                //lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100, 1, gpsListener)
 //           Log.d(
 //               "Test", "GPS Location changed, Latitude: $latitude" +
 //                       ", Longitude: $longitude" + ", isGPSEnabled: $isGPSEnabled" + ", isNetworkEnabled: $isNetworkEnabled"
@@ -156,7 +162,7 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
                lm.removeUpdates(gpsLocationListener)*/
            }
 
-           setDaumMapCurrentLocation(tmpLatitude, tmpLongitude, mapView)
+           setDaumMapCurrentLocation(tmpLatitude, tmpLongitude, mapView!!)
            getAddress(tmpLatitude, tmpLongitude)
 
 
@@ -190,9 +196,24 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        if(locationPermission) {
+            mapView = MapView(this)
+            map!!.addView(mapView)
+        }
+
+    }
+
+    override fun finish(){
+        map?.removeView(mapView)
+        super.finish()
+    }
+
     private fun gotoMain(){
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
+        finish()
     }
 
     private fun getAddress(latitude: Double, longitude: Double) {

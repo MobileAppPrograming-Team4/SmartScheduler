@@ -2,11 +2,21 @@ package com.example.smartscheduler.Activity
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
+import android.content.DialogInterface
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.TextUtils
 import android.util.Log
+import android.view.View
+import android.view.Window
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.smartscheduler.*
 import com.example.smartscheduler.Database.ScheduleInfo
@@ -25,7 +35,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import android.content.Intent as Intent
+import kotlin.concurrent.thread
+import kotlin.properties.Delegates
 
 class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.CompleteListener {
     lateinit var startTimeTextView: TextView
@@ -49,6 +60,9 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     var destRoad: String? = null
     var destLatitude: Double? = 0.0
     var destLongitude: Double? = 0.0
+    var sleepAlarmHour:Int? = null
+    var sleepAlarmMinute:Int? = null
+    var isSleepAlarmOn = false
 
     lateinit var odsayService: ODsayService
     lateinit var jsonObject: JSONObject
@@ -100,8 +114,6 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
         }
 
-        setNewDestination()
-
 
         val scheduleExplain = findViewById<EditText>(R.id.scheduleExplain)
         scheduleTime()
@@ -119,21 +131,18 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 R.id.walk -> {
                     transportType = 2
                 }
-                else -> transportType = null
+                else -> {
+                    transportType = null
+                }
             }
         }
 
-        when (transportType) {
+        /*when (transportType) {
             0 -> totalTime = setPublicTime()
             1 -> totalTime = 10
             2 -> totalTime = 10
             else -> totalTime = 0
-        }
-
-        val elapsedTime = totalTime
-
-        alarmHour = startHour + (elapsedTime!! / 60)
-        alarmMinute = startMinute + (elapsedTime!! % 60)
+        }*/
 
         /* place Information */
         var isAlarmOn: Boolean = true
@@ -144,6 +153,19 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         }
 
         findViewById<Button>(R.id.saveButton).setOnClickListener {
+            // 저장하기 버튼을 누르면
+            // 1. 소요시간 계산
+            totalTime = when (transportType) {
+                0 -> setPublicTime()
+                1 -> 10
+                2 -> 10
+                else -> 0
+            }
+            // 2. 출발 알람이 켜져있으면 알람이 울릴 시간 계산
+            if(isAlarmOn){
+                calculateAlarmClock(totalTime!!)
+            }
+            // 3. 일정내용이 비어있지 않으면 scheduleInfo를 MainActivity로 넘김
             if (scheduleExplain.text.toString().isNotEmpty()) {
                 val scheduleInfo = ScheduleInfo(
                     sId,
@@ -158,10 +180,13 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                     null,
                     null,
                     transportType,
-                    elapsedTime,
+                    totalTime,
                     alarmHour,
                     alarmMinute,
-                    isAlarmOn
+                    isAlarmOn,
+                    sleepAlarmHour,
+                    sleepAlarmMinute,
+                    isSleepAlarmOn
                 )
                 Log.d(
                     "Addschedule",
@@ -169,7 +194,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 )
                 val intent = Intent()
                 intent.putExtra("scheduleInfo", scheduleInfo)
-                setResult(RESULT_OK, intent)
+                setResult(Activity.RESULT_OK, intent)
+                // 4. AddScheduleActivity 종료
                 finish()
             } else {
                 Toast.makeText(this, "일정 내용을 입력해주세요", Toast.LENGTH_LONG).show()
@@ -283,20 +309,35 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         return totalTime
     }
 
-    private fun setNewDestination() {
+    private fun calculateAlarmClock(elapsedTime:Int){
+        //알람 시간(나갈 준비를 해야 하는 시간)을 계산: 일정 시작 시간 - 이동 소요 시간 - 외출 준비 시간
+        //elapsedTime ; 출발 ~ 도착지 소요시간(단위 : 분)
+        Log.d("소요시간","${elapsedTime}분")
+        // 사용자 정보 불러오기
+        val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
+        val readyTime = userInfo.getInt("readyTime", 0) //외출준비시간(단위: 시간)
+        val sleepTime = userInfo.getInt("sleepTime", 0) //수면시간(단위: 시간)
 
-        var intent = intent
-        destName = intent.getSerializableExtra("destName").toString()
-        destAddress = intent.getSerializableExtra("destAddress").toString()
-        destRoad = intent.getSerializableExtra("destRoad").toString()
-        destLatitude = intent.getDoubleExtra("destLatitude", 0.0)
-        destLongitude = intent.getDoubleExtra("destLongitude", 0.0)
+        // 소요시간의 단위를 (분)에서 (시+분)으로 변환
+        val elapsedTime_hour = elapsedTime / 60
+        val elapsedTime_minute = elapsedTime % 60
 
-        destination = findViewById(R.id.locationText)
-        locationText.setText("위치 : " + destName)
+        // 알람 시간 계산
+        alarmMinute = startMinute - elapsedTime_minute
+        alarmHour = startHour - elapsedTime_hour - readyTime
+        if(alarmMinute<0){
+            alarmMinute += 60
+            alarmHour -= 1
+        }
+        if(alarmHour<0)
 
-        Log.d("newdestination : ", "name : $destName \n address : $destAddress \n road : $destRoad \n lat : $destLatitude \n long : $destLongitude" )
-
+        // 외출준비 알람이 울리는 시간 - 수면시간이 선택한 날의 이전일 경우 취침 알람을 킴
+        // 예시: 12월 3일에 외출준비 시간 알람이 7시에 울려야 하고, 수면 시간이 8시간일 때, 12월 2일 23시에 취침 시간을 알려줌
+        if(alarmHour - sleepTime < 0){
+            // 취침 알람 시간 계산
+            sleepAlarmHour = alarmHour - sleepTime + 24
+            sleepAlarmMinute = alarmMinute
+            isSleepAlarmOn = true
+        }
     }
 }
-
