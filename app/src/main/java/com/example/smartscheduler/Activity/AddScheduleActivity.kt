@@ -326,7 +326,6 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         val depX = userInfo.getString("userLongitude","")
         val depY = userInfo.getString("userLatitude","")
 
-        /*
         val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
 
         var url = "https://apis.openapi.sk.com/tmap/routes/pedestrian?"
@@ -348,6 +347,21 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             .url(url)
             .build()
 
+        val response = client.newCall(request).execute()
+        val data = response.body?.string()
+
+        val jsonObj = JSONObject(data)
+        val featureArray = jsonObj.getJSONArray("features")
+        val firstFeature = featureArray.getJSONObject(0)
+        val property = firstFeature.getJSONObject("properties")
+        val walkTime = (property.getInt("totalTime") / 60) + 1
+
+        totalTime = walkTime
+
+        expectedtime1 = findViewById(R.id.expectedtime1)
+        expectedtime1.setText(totalTime.toString() + "분")
+
+        /*
         val response = client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
@@ -367,11 +381,12 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 expectedtime1.setText(totalTime.toString() + "분")
             }
         })
-         */
 
         expectedtime1 = findViewById(R.id.expectedtime1)
         expectedtime1.setText(totalTime.toString() + "분")
         totalTime = 7
+
+         */
     }
 
     //자동차 예상 소요 시간을 초 단위로 계산후 반환
