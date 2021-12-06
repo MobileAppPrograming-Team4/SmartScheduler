@@ -100,8 +100,6 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
         }
 
-        setNewDestination()
-
 
         val scheduleExplain = findViewById<EditText>(R.id.scheduleExplain)
         scheduleTime()
@@ -297,6 +295,20 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
         Log.d("newdestination : ", "name : $destName \n address : $destAddress \n road : $destRoad \n lat : $destLatitude \n long : $destLongitude" )
 
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            destName = data!!.getStringExtra("destName")
+            destAddress = data!!.getStringExtra("destAddress")
+            destRoad = data!!.getStringExtra("destRoad")
+            destLatitude = data!!.getDoubleExtra("destLatitude", 0.0)
+            destLongitude = data!!.getDoubleExtra("destLongitude", 0.0)
+            locationText.setText("위치 : " + destName)
+            Log.d("newdestination : ", "받은 로그 name : $destName \n address : $destAddress \n road : $destRoad \n lat : $destLatitude \n long : $destLongitude" )
+
+        }
     }
 }
 
