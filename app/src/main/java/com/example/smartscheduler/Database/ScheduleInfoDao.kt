@@ -20,6 +20,14 @@ interface ScheduleInfoDao {
     @Query("SELECT * FROM schedule_database WHERE schedule_start_year=:year and schedule_start_month=:month and schedule_start_day=:day and set_alarm=1")
     fun getAlarm(year:Int, month:Int, day:Int):List<ScheduleInfo>
 
+    //set_sleep_alarm이 true인 일정 가져오기
+    @Query("SELECT * FROM schedule_database WHERE schedule_start_year=:year and schedule_start_month=:month and schedule_start_day=:day and set_sleep_alarm=1 ORDER BY sleep_alarm_hour, sleep_alarm_minute")
+    fun getSleepAlarm(year:Int, month:Int, day:Int):List<ScheduleInfo>
+
+    //내일 일정인데 오늘 알람이 울려야 하는 일정 가져오기
+    @Query("SELECT * FROM schedule_database WHERE schedule_start_year=:year and schedule_start_month=:month and schedule_start_day=:day and set_alarm=1 and alarm_hour<0")
+    fun getTomorrowAlarm(year:Int, month:Int, day:Int):List<ScheduleInfo>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE) //충돌이 발생하면 기존데이터와 입력데이터를 교체
     suspend fun insert(scheduleInfo: ScheduleInfo)
 

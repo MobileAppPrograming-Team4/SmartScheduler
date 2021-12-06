@@ -27,6 +27,7 @@ import com.example.smartscheduler.*
 import com.example.smartscheduler.Database.ScheduleInfo
 import com.example.smartscheduler.Database.ScheduleViewModel
 import com.example.smartscheduler.Decorator.*
+import com.kakao.sdk.common.KakaoSdk
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.CalendarMode
 import java.text.SimpleDateFormat
@@ -38,6 +39,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var addSchedule: Button
     private lateinit var calendarView: com.prolificinteractive.materialcalendarview.MaterialCalendarView
     private lateinit var settingBt : ImageButton
+    var currentYear: Int? = null  //오늘 년
+    var currentMonth: Int? = null //오늘 월
+    var currentDate: Int? = null  //오늘 일
     var selectedYear: Int? = null
     var selectedMonth: Int? = null
     var selectedDate: Int? = null
@@ -52,7 +56,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("onCreate","실행")
         super.onCreate(savedInstanceState)
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.activity_main)
         val recyclerView =
             findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recyclerView)
@@ -110,19 +113,35 @@ class MainActivity : AppCompatActivity() {
             goToUserInfo()
         }
 
+        scheduleViewModel.sleepAlarmData.observe(this, {
+            setSleepAlarm(it, this)
+        })
         scheduleViewModel.alarmData.observe(this, {
+            setAlarm(it, this)
+        })
+        scheduleViewModel.tomorrowAlarmData.observe(this, {
             setAlarm(it, this)
         })
         getAlarm()
 
     }
     private fun getAlarm(){
-        //database에서 오늘 알람이 켜져있는 일정 모두 가져오기
         val cal = Calendar.getInstance(Locale.KOREA)
-        val currentYear = cal.get(Calendar.YEAR)
-        val currentMonth = cal.get(Calendar.MONTH) + 1
-        val currentDate = cal.get(Calendar.DATE)
-        scheduleViewModel.getAlarm(currentYear, currentMonth, currentDate)
+        currentYear = cal.get(Calendar.YEAR)
+        currentMonth = cal.get(Calendar.MONTH) + 1
+        currentDate = cal.get(Calendar.DATE)
+        //내일 날짜
+        val today = cal
+        cal.add(Calendar.DATE, 1)
+        val tomorrowYear = today.get(Calendar.YEAR)
+        val tomorrowMonth = today.get(Calendar.MONTH) + 1
+        val tomorrowDate = today.get(Calendar.DATE)
+        //database에서 오늘 알람이 켜져있는 일정 모두 가져오기
+        scheduleViewModel.getAlarm(currentYear!!, currentMonth!!, currentDate!!)
+        //database에서 오늘 취침 알람을 울려야 하는 일정 모두 가져오기
+        scheduleViewModel.getSleepAlarm(tomorrowYear, tomorrowMonth, tomorrowDate)
+        //database에서 내일 일정이지만 오늘 알람을 울려야 하는 일정 모두 가져오기
+        scheduleViewModel.getTomorrowAlarm(tomorrowYear, tomorrowMonth, tomorrowDate)
     }
 
     //private val M_ALARM_REQUEST_CODE = 1000
@@ -133,6 +152,12 @@ class MainActivity : AppCompatActivity() {
         val calendar = Calendar.getInstance(Locale.KOREA)
 
         for(item in list){
+            if(item.alarmHour!!<0) {
+                // 내일 일정인데 알람은 오늘 울려야 하는 경우
+                // 12월 6일 -1시에 알람이 설정되어 있으면 12월 5일 23시에 알람이 울려야 한다
+                item.alarmHour = item.alarmHour!! + 24
+                Log.d("내일 일정인데","오늘 ${item.alarmHour}시${item.alarmMinute}분에 울릴 예정")
+            }
             //알람이 울릴 시간 설정
             calendar.set(Calendar.HOUR_OF_DAY, item.alarmHour!!)
             calendar.set(Calendar.MINUTE, item.alarmMinute!!)
@@ -152,19 +177,66 @@ class MainActivity : AppCompatActivity() {
                 pendingIntent?.cancel()
                 continue
             }
+            // pendingIntent로 AlarmReceiver에 알람 정보를 알려줌
+            val bundle = Bundle()
+            bundle.putSerializable("alarmInfo",item)
+            intent.putExtra("bundle", bundle)
 
             val alarmIntent = PendingIntent.getBroadcast(
                 context,
                 item.sId,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_CANCEL_CURRENT
             )
 
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                calendar.timeInMillis,
+            alarmManager.setAlarmClock(
+                AlarmManager.AlarmClockInfo(calendar.timeInMillis, alarmIntent),
                 alarmIntent
             )
+        }
+    }
+
+    val SLEEP_ALARM_ID = 3108
+    @TargetApi(Build.VERSION_CODES.M)
+    private fun setSleepAlarm(list: List<ScheduleInfo>, context: Context){
+        for(item in list){
+            val alarmManager: AlarmManager =
+                context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+            //알람이 울릴 시간 설정
+            val calendar = Calendar.getInstance(Locale.KOREA)
+            calendar.set(Calendar.HOUR_OF_DAY, item.sleepAlarmHour!!)
+            calendar.set(Calendar.MINUTE, item.sleepAlarmMinute!!)
+            calendar.set(Calendar.SECOND, 0)
+            Log.d("취침 알람 시간", "${item.sleepAlarmHour}시${item.sleepAlarmMinute}분")
+
+            if (calendar.before(Calendar.getInstance(Locale.KOREA))) {
+                //현재시간보다 빠른 알람은 취소
+                val pendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    SLEEP_ALARM_ID,
+                    intent,
+                    PendingIntent.FLAG_CANCEL_CURRENT
+                )
+                pendingIntent?.cancel()
+                return
+            }
+
+            //SleepAlarmReceiver에 값 전달
+            val intent =
+                Intent(context, SleepAlarmReceiver::class.java) //알람 조건이 충족되었을 때, 리시버로 전달될 인텐트 설정
+            val alarmIntent = PendingIntent.getBroadcast(
+                context,
+                SLEEP_ALARM_ID,
+                intent,
+                PendingIntent.FLAG_CANCEL_CURRENT //PendingIntent가 이미 존재할 경우, 기존 PendingIntent를 cancel하고 다시 생성
+            )
+
+            alarmManager.setAlarmClock(
+                AlarmManager.AlarmClockInfo(calendar.timeInMillis, alarmIntent),
+                alarmIntent
+            )
+            break //취침 알람은 한 번만 울린다
         }
     }
 
@@ -267,6 +339,11 @@ class MainActivity : AppCompatActivity() {
             scheduleList = scheduleViewModel.currentData
             goToRoute(scheduleList.value?.get(position)!!, selectedYear!!, selectedMonth!!, selectedDate!!)
         }
+
+        override fun carroute(position: Int){
+            scheduleList = scheduleViewModel.currentData
+            goToCarRoute(scheduleList.value?.get(position)!!, selectedYear!!, selectedMonth!!, selectedDate!!)
+        }
     }
     fun addOrModify(scheduleInfo: ScheduleInfo?, year:Int?, month:Int?, date:Int?){
         val intent = Intent(this, AddScheduleActivity::class.java)
@@ -284,6 +361,11 @@ class MainActivity : AppCompatActivity() {
 
     fun goToRoute(scheduleInfo: ScheduleInfo?, year: Int?, month: Int?, date: Int?) {
         val intent = Intent(this, WalkRouteActivity::class.java)
+        startActivity(intent)
+    }
+
+    fun goToCarRoute(scheduleInfo: ScheduleInfo?, year: Int?, month: Int?, date: Int?) {
+        val intent = Intent(this, CarRoute::class.java)
         startActivity(intent)
     }
 

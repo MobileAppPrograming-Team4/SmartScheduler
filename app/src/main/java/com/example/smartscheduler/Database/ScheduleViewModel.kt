@@ -22,6 +22,14 @@ class ScheduleViewModel(application: Application) : AndroidViewModel(application
     val alarmData : LiveData<List<ScheduleInfo>>
         get() = _alarmData
 
+    private var _sleepAlarmData = MutableLiveData<List<ScheduleInfo>>()
+    val sleepAlarmData : LiveData<List<ScheduleInfo>>
+        get() = _sleepAlarmData
+
+    private var _tomorrowAlarmData = MutableLiveData<List<ScheduleInfo>>()
+    val tomorrowAlarmData : LiveData<List<ScheduleInfo>>
+        get() = _tomorrowAlarmData
+
     private var repository:ScheduleRepository
 
     init {
@@ -54,6 +62,18 @@ class ScheduleViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch(Dispatchers.IO){
             val tmp = repository.getAlarm(year, month, date)
             _alarmData.postValue(tmp)
+        }
+    }
+    fun getSleepAlarm(year:Int, month:Int, date:Int){
+        viewModelScope.launch(Dispatchers.IO){
+            val tmp = repository.getSleepAlarm(year, month, date)
+            _sleepAlarmData.postValue(tmp)
+        }
+    }
+    fun getTomorrowAlarm(year:Int, month:Int, date:Int){
+        viewModelScope.launch(Dispatchers.IO){
+            val tmp = repository.getTomorrowAlarm(year, month, date)
+            _tomorrowAlarmData.postValue(tmp)
         }
     }
 }

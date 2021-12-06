@@ -29,4 +29,10 @@ class ScheduleRepository(private val scheduleInfoDao: ScheduleInfoDao) {
     fun getAlarm(year:Int, month: Int, date:Int): List<ScheduleInfo> {
         return scheduleInfoDao.getAlarm(year, month, date)
     }
+    fun getSleepAlarm(year: Int, month: Int, date: Int): List<ScheduleInfo> {
+        return scheduleInfoDao.getSleepAlarm(year, month, date)
+    }
+    fun getTomorrowAlarm(year: Int, month: Int, date: Int):List<ScheduleInfo>{
+        return scheduleInfoDao.getTomorrowAlarm(year, month, date)
+    }
 }
