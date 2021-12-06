@@ -44,6 +44,10 @@ class CarRoute : AppCompatActivity() {
         KakaoSdk.init(this, "5f9edbd5b9db541446f51c121146a651")
         setContentView(R.layout.activity_carroute)
 
+        val getIntent = getIntent()
+        val x = getIntent.getIntExtra("x", 0)
+        val y = getIntent.getIntExtra("y", 0)
+
         val mapView = MapView(this)
         map = findViewById(R.id.clKakaoMapView)
         curloc = findViewById(R.id.currentLocationButton)
