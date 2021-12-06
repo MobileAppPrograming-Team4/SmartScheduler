@@ -2,12 +2,21 @@ package com.example.smartscheduler.Activity
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
+import android.content.DialogInterface
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.TextUtils
 import android.util.Log
+import android.view.View
+import android.view.Window
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.smartscheduler.*
 import com.example.smartscheduler.Database.ScheduleInfo
@@ -17,6 +26,7 @@ import com.odsay.odsayandroidsdk.API;
 import com.odsay.odsayandroidsdk.ODsayData;
 import com.odsay.odsayandroidsdk.ODsayService;
 import com.odsay.odsayandroidsdk.OnResultCallbackListener;
+import kotlinx.android.synthetic.main.activity_addschedule.*
 import net.daum.mf.map.api.MapView
 
 import org.json.JSONObject;
@@ -25,15 +35,16 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.concurrent.thread
+import kotlin.properties.Delegates
 import java.util.concurrent.TimeUnit
 
 class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.CompleteListener {
     lateinit var startTimeTextView: TextView
     lateinit var finishTimeTextView: TextView
+    lateinit var destination: TextView
     lateinit var cal: Calendar
     lateinit var transportGroup: RadioGroup
-    lateinit var map: ConstraintLayout
-    lateinit var location: EditText
     lateinit var searchButton: ImageButton
     lateinit var expectedtime1 : TextView
     var startHour = 0
@@ -46,6 +57,14 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     var totalTime: Int? = null
     var alarmHour = 0
     var alarmMinute = 0
+    var destName: String? = null
+    var destAddress: String? = null
+    var destRoad: String? = null
+    var destLatitude: Double? = 0.0
+    var destLongitude: Double? = 0.0
+    var sleepAlarmHour:Int? = null
+    var sleepAlarmMinute:Int? = null
+    var isSleepAlarmOn = false
 
     lateinit var odsayService: ODsayService
     lateinit var jsonObject: JSONObject
@@ -62,7 +81,6 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
         startTimeTextView = findViewById(R.id.startTimeTextView)
         finishTimeTextView = findViewById(R.id.finishTimeTextView)
-        location = findViewById(R.id.locationString)
         searchButton = findViewById(R.id.locationSearchButton)
 
         var sId: Int = 0
@@ -85,14 +103,19 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             finishMinute = startMinute
         }
 
+//        searchButton.setOnClickListener {
+//            searchKeyword(location.text.toString())
+//            val intent = Intent(this, DestinationSearchActivity::class.java)
+//            intent.putExtra("destination", placeList)
+//        }
+
         searchButton.setOnClickListener {
-            searchKeyword(location.text.toString())
+            val intent = Intent(this, DestinationSearchActivity::class.java)
+            startActivityForResult(intent, 0)
+
+
         }
 
-
-        val mapView = MapView(this)
-        map = findViewById(R.id.clKakaoMapView)
-        map.addView(mapView)
 
         val scheduleExplain = findViewById<EditText>(R.id.scheduleExplain)
         scheduleTime()
@@ -111,21 +134,18 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 R.id.walk -> {
                     transportType = 2
                 }
-                else -> transportType = null
+                else -> {
+                    transportType = null
+                }
             }
         }
 
-        when (transportType) {
+        /*when (transportType) {
             0 -> totalTime = setPublicTime()
             1 -> totalTime = 10
             2 -> totalTime = 10
             else -> totalTime = 0
-        }
-
-        val elapsedTime = totalTime
-
-        alarmHour = startHour + (elapsedTime!! / 60)
-        alarmMinute = startMinute + (elapsedTime!! % 60)
+        }*/
 
         /* place Information */
         var isAlarmOn: Boolean = true
@@ -136,6 +156,19 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         }
 
         findViewById<Button>(R.id.saveButton).setOnClickListener {
+            // 저장하기 버튼을 누르면
+            // 1. 소요시간 계산
+            totalTime = when (transportType) {
+                0 -> setPublicTime()
+                1 -> 10
+                2 -> 10
+                else -> 0
+            }
+            // 2. 출발 알람이 켜져있으면 알람이 울릴 시간 계산
+            if(isAlarmOn){
+                calculateAlarmClock(totalTime!!)
+            }
+            // 3. 일정내용이 비어있지 않으면 scheduleInfo를 MainActivity로 넘김
             if (scheduleExplain.text.toString().isNotEmpty()) {
                 val scheduleInfo = ScheduleInfo(
                     sId,
@@ -150,10 +183,13 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                     null,
                     null,
                     transportType,
-                    elapsedTime,
+                    totalTime,
                     alarmHour,
                     alarmMinute,
-                    isAlarmOn
+                    isAlarmOn,
+                    sleepAlarmHour,
+                    sleepAlarmMinute,
+                    isSleepAlarmOn
                 )
                 Log.d(
                     "Addschedule",
@@ -162,38 +198,12 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 val intent = Intent()
                 intent.putExtra("scheduleInfo", scheduleInfo)
                 setResult(Activity.RESULT_OK, intent)
+                // 4. AddScheduleActivity 종료
                 finish()
             } else {
                 Toast.makeText(this, "일정 내용을 입력해주세요", Toast.LENGTH_LONG).show()
             }
         }
-    }
-
-    //키워드 검색 함
-    private fun searchKeyword(keyword: String) {
-        val retrofit = Retrofit.Builder()   // Retrofit 구성
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val api = retrofit.create(kakaoAPI::class.java)   // 통신 인터페이스를 객체로 생성
-        val call = api.getSearchKeyword(API_KEY, keyword)   // 검색 조건 입력
-
-        // API 서버에 요청
-        call.enqueue(object: Callback<ResultSearchKeyword> {
-            override fun onResponse(
-                call: Call<ResultSearchKeyword>,
-                response: Response<ResultSearchKeyword>
-            ) {
-                // 통신 성공 (검색 결과는 response.body()에 담겨있음)
-                Log.d("Test", "Raw: ${response.raw()}")
-                Log.d("Test", "Body: ${response.body()}")
-            }
-
-            override fun onFailure(call: Call<ResultSearchKeyword>, t: Throwable) {
-                // 통신 실패
-                Log.w("MainActivity", "통신 실패: ${t.message}")
-            }
-        })
     }
 
     override fun setTime(hour: Int, minute: Int, startOrFinish: Int) {
@@ -301,6 +311,54 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         )
 
         return totalTime
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            destName = data!!.getStringExtra("destName")
+            destAddress = data!!.getStringExtra("destAddress")
+            destRoad = data!!.getStringExtra("destRoad")
+            destLatitude = data!!.getDoubleExtra("destLatitude", 0.0)
+            destLongitude = data!!.getDoubleExtra("destLongitude", 0.0)
+            locationText.setText("위치 : " + destName)
+            Log.d(
+                "newdestination : ",
+                "받은 로그 name : $destName \n address : $destAddress \n road : $destRoad \n lat : $destLatitude \n long : $destLongitude"
+            )
+        }
+    }
+
+    private fun calculateAlarmClock(elapsedTime:Int){
+        //알람 시간(나갈 준비를 해야 하는 시간)을 계산: 일정 시작 시간 - 이동 소요 시간 - 외출 준비 시간
+        //elapsedTime ; 출발 ~ 도착지 소요시간(단위 : 분)
+        Log.d("소요시간","${elapsedTime}분")
+        // 사용자 정보 불러오기
+        val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
+        val readyTime = userInfo.getInt("readyTime", 0) //외출준비시간(단위: 시간)
+        val sleepTime = userInfo.getInt("sleepTime", 0) //수면시간(단위: 시간)
+
+        // 소요시간의 단위를 (분)에서 (시+분)으로 변환
+        val elapsedTime_hour = elapsedTime / 60
+        val elapsedTime_minute = elapsedTime % 60
+
+        // 알람 시간 계산
+        alarmMinute = startMinute - elapsedTime_minute
+        alarmHour = startHour - elapsedTime_hour - readyTime
+        if(alarmMinute<0){
+            alarmMinute += 60
+            alarmHour -= 1
+        }
+        if(alarmHour<0)
+
+        // 외출준비 알람이 울리는 시간 - 수면시간이 선택한 날의 이전일 경우 취침 알람을 킴
+        // 예시: 12월 3일에 외출준비 시간 알람이 7시에 울려야 하고, 수면 시간이 8시간일 때, 12월 2일 23시에 취침 시간을 알려줌
+            if(alarmHour - sleepTime < 0){
+                // 취침 알람 시간 계산
+                sleepAlarmHour = alarmHour - sleepTime + 24
+                sleepAlarmMinute = alarmMinute
+                isSleepAlarmOn = true
+            }
     }
 
     //자동차 예상 소요 시간을 초 단위로 계산후 반환

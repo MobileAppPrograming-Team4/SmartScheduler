@@ -24,6 +24,13 @@
                 <action android:name="android.intent.action.INPUT_METHOD_CHANGED" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".SleepAlarmReceiver"  android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.INPUT_METHOD_CHANGED" />
+            </intent-filter>
+        </receiver>
+
 
         <activity
             android:name=".Activity.MainActivity"
@@ -40,9 +47,12 @@
         <activity android:name=".Activity.PublicRouteActivity"/>
         <activity android:name=".Activity.CarRoute"/>
         <activity android:name=".Activity.CarNavigation"/>
+        <activity android:name=".Activity.DestinationSearchActivity"/>
 
 <!--카카오맵 네이티브 앱 key-->
         <meta-data android:name="com.kakao.sdk.AppKey" android:value="5f9edbd5b9db541446f51c121146a651"/>
+<!--google cloud platform 앱 key-->
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyBoUlyfq_7jws7-AJR0PjGqmbwFz5H_1qQ"/>
     </application>
 
 </manifest>
