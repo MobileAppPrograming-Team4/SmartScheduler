@@ -51,7 +51,6 @@ class CarRoute : AppCompatActivity() {
         curloc = findViewById(R.id.currentLocationButton)
         map.addView(mapView)
 
-
         val destInfo: SharedPreferences = getSharedPreferences("destInfo", Activity.MODE_PRIVATE)
 
         val destx = destInfo.getString("destx","")
