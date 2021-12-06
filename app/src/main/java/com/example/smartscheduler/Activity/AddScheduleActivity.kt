@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.text.TextUtils
 import android.util.Log
 import android.widget.*
@@ -47,6 +48,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     lateinit var odsayService: ODsayService
     lateinit var jsonObject: JSONObject
 
+    val tmapKey : String = "l7xx6856c73aa91c41e480afc960d336d8c3"
+
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,32 +87,20 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             when (checkedId) {
                 R.id.publicTransport -> {
                     transportType = 0
+                    totalTime = setPublicTime()
                 }
                 R.id.car -> {
                     transportType = 1
+                    totalTime = 10
                 }
                 R.id.walk -> {
                     transportType = 2
+                    totalTime = setWalkTime()
                 }
                 else -> transportType = null
             }
         }
 
-        when (transportType) {
-            0 -> totalTime = setPublicTime()
-            1 -> totalTime = 10
-            2 -> totalTime = 10
-            else -> totalTime = 0
-        }
-
-        val elapsedTime = totalTime
-
-        alarmHour = startHour - (elapsedTime!! / 60)
-        alarmMinute = startMinute - (elapsedTime!! % 60)
-        if (alarmMinute < 0) {
-            alarmHour -= 1
-            alarmMinute += 60
-        }
 
         /* place Information */
         var isAlarmOn: Boolean = true
@@ -120,6 +111,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         }
 
         findViewById<Button>(R.id.saveButton).setOnClickListener {
+            println(totalTime)
+
             if (scheduleExplain.text.toString().isNotEmpty()) {
                 val scheduleInfo = ScheduleInfo(
                     sId,
@@ -134,7 +127,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                     null,
                     null,
                     transportType,
-                    elapsedTime,
+                    totalTime,
                     alarmHour,
                     alarmMinute,
                     isAlarmOn
@@ -225,7 +218,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
         odsayService = ODsayService.init(
             this,
-            BuildConfig.ODsay_API_KEY
+            "2hQo8uVDi/FJlk7TilYT8gwEYlBs89Wib0Pc93yLrus"
         )
         odsayService.setConnectionTimeout(5000)
         odsayService.setReadTimeout(5000)
@@ -260,6 +253,52 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     }
 
     private fun setWalkTime(): Int {
+        println("얘도 괜찮?")
+        var totalTime = 0
 
+        val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
+
+        var url = "https://apis.openapi.sk.com/tmap/routes/pedestrian?"
+        val client = OkHttpClient()
+
+        url += "startX=128.61027824041773"
+        url += "&startY=35.88902720456651"
+        url += "&endX=128.6119321645856"
+        url += "&endY=35.89113011991111"
+        url += "&reqCoordType=WGS84GEO"
+        url += "&startName=" + URLEncoder.encode("경북대학교 테니스장", "UTF-8")
+        url += "&endName=" + URLEncoder.encode("경북대학교 중앙도서관", "UTF-8")
+        url += "&searchOption=0&resCoordType=WGS84GEO"
+
+        val request = Request.Builder()
+            .header("Accept", "application/json")
+            .addHeader("appKey", tmapKey)
+            .addHeader("Content-Type", "application/json; charset=UTF-8")
+            .url(url)
+            .build()
+
+        var myHandler = Handler()
+
+        val response = client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+            }
+            override fun onResponse(call: Call, response: Response) {
+                Thread {
+                    val data = response.body?.string()
+
+                    val jsonObj = JSONObject(data)
+                    val featureArray = jsonObj.getJSONArray("features")
+                    val firstFeature = featureArray.getJSONObject(0)
+                    val property = firstFeature.getJSONObject("properties")
+                    val walkTime = (property.getInt("totalTime") / 60) + 1
+
+                    myHandler.post {
+                        totalTime = walkTime
+                    }
+                }.start()
+            }
+        })
+        return totalTime
     }
 }

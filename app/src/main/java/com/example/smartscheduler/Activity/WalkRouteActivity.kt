@@ -3,11 +3,11 @@ package com.example.smartscheduler.Activity
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import com.example.smartscheduler.*
 
@@ -28,9 +28,6 @@ class WalkRouteActivity : AppCompatActivity() {
 
     lateinit var tmapView : TMapView
     lateinit var tMapPolyLine: TMapPolyLine
-
-    var walkTime = 0
-    var walkDistance = 0
 
     val tmapKey : String = "l7xx6856c73aa91c41e480afc960d336d8c3"
 
@@ -96,8 +93,8 @@ class WalkRouteActivity : AppCompatActivity() {
                     val featureArray = jsonObj.getJSONArray("features")
                     val firstFeature = featureArray.getJSONObject(0)
                     val property = firstFeature.getJSONObject("properties")
-                    walkTime = (property.getInt("totalTime") / 60) + 1
-                    walkDistance = property.getInt("totalDistance")
+                    val walkTime = (property.getInt("totalTime") / 60) + 1
+                    val walkDistance = property.getInt("totalDistance")
 
                     myHandler.post {
                         totalTime.setText(walkTime.toString() + "분")
