@@ -103,7 +103,7 @@ class CarRoute : AppCompatActivity() {
         mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude), true)
 
         // 줌 레벨 변경
-        mapView.setZoomLevel(4, true)
+        mapView.setZoomLevel(1, true)
 
         // 줌 인
         mapView.zoomIn(true)
