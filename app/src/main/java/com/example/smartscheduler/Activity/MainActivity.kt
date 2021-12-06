@@ -342,7 +342,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun carroute(position: Int){
             scheduleList = scheduleViewModel.currentData
-            goToCarRoute(scheduleList.value?.get(position)!!, selectedYear!!, selectedMonth!!, selectedDate!!)
+            goToCarRoute(scheduleList.value?.get(position)!!)
         }
     }
     fun addOrModify(scheduleInfo: ScheduleInfo?, year:Int?, month:Int?, date:Int?){
@@ -364,8 +364,10 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun goToCarRoute(scheduleInfo: ScheduleInfo?, year: Int?, month: Int?, date: Int?) {
+    fun goToCarRoute(scheduleInfo: ScheduleInfo?) {
         val intent = Intent(this, CarRoute::class.java)
+        intent.putExtra("x",scheduleInfo!!.schedulePlace_x_double)
+        intent.putExtra("y",scheduleInfo!!.schedulePlace_y_double)
         startActivity(intent)
     }
 
