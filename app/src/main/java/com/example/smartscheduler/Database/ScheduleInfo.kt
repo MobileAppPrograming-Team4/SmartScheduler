@@ -17,8 +17,10 @@ data class ScheduleInfo(
     @ColumnInfo(name = "schedule_start_minute") var scheduleStartMinute: Int, // 시작 분
     @ColumnInfo(name = "schedule_finish_hour") var scheduleFinishHour: Int, // 종료 시
     @ColumnInfo(name = "schedule_finish_minute") var scheduleFinishMinute: Int, // 종료 분
-    @ColumnInfo(name = "schedule_place_x") var schedulePlace_x: Int?, // 장소 x
-    @ColumnInfo(name = "schedule_place_y") var schedulePlace_y: Int?, // 장소 y
+    @ColumnInfo(name = "schedule_place_x") var schedulePlace_x: Int?, // 장소 x(쓰면안됨)
+    @ColumnInfo(name = "schedule_place_y") var schedulePlace_y: Int?, // 장소 y(쓰면안됨)
+    @ColumnInfo(name = "schedule_place_x_double") var schedulePlace_x_double: Double?, // 장소 x(double)
+    @ColumnInfo(name = "schedule_place_y_double") var schedulePlace_y_double: Double?, // 장소 y(double)
     @ColumnInfo(name = "transportation") var transportation: Int?, //0: 대중교통, 1: 자동차, 2: 도보
     @ColumnInfo(name = "elapsed_time") var elapsedTime: Int?, // 예상이동시간
     @ColumnInfo(name = "alarm_hour") var alarmHour: Int?, //알람 시각(시)
