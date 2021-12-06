@@ -1,7 +1,9 @@
 package com.example.smartscheduler.Activity
 
+import android.app.Activity
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.webkit.WebView
@@ -50,27 +52,11 @@ class CarRoute : AppCompatActivity() {
         map.addView(mapView)
 
 
-        val origin : String = "128.6112347669226,35.88546795750079" //출발지 좌표
-        val destination : String = "128.61646900942918,35.88790748120179" //목적지 좌표
+        val destInfo: SharedPreferences = getSharedPreferences("destInfo", Activity.MODE_PRIVATE)
 
-        val api = kakaonaviAPI.create()
-        val callGetSearchCarRoute = api.getSearchCarRoute(API_KEY,origin,destination)
-
-        callGetSearchCarRoute.enqueue(object : Callback<ResultCarRouteSearch> {
-            override fun onResponse(
-                call: Call<ResultCarRouteSearch>,
-                response: Response<ResultCarRouteSearch>
-            ) {
-                RouteInformation = response.body()
-                Log.d("결과","성공 : ${response.raw()}")
-                Log.d("결과","성공 : ${response.body()}")
-                expectedtime = findViewById(R.id.expectedtime)
-                expectedtime.setText(expectedtimetoString(RouteInformation!!.routes[0].summary.duration))
-            }
-            override fun onFailure(call: Call<ResultCarRouteSearch>, t: Throwable) {
-                Log.d("결과","실패 : ${t.message}")
-            }
-        })
+        val destx = destInfo.getString("destx","")
+        val desty = destInfo.getString("desty","")//출발지 경도
+        val destname = destInfo.getString("destname","")
 
         //내비게이션 시작 버튼
         startNaviBtn = findViewById(R.id.startNaviBtn)
@@ -79,7 +65,7 @@ class CarRoute : AppCompatActivity() {
             if (NaviClient.instance.isKakaoNaviInstalled(this)) {
                 startActivity(
                     NaviClient.instance.navigateIntent(
-                        Location("카카오 판교오피스", "127.108640", "37.402111"),
+                        Location(name=destname!!,x=destx!!,y=desty!!),
                         NaviOption(coordType = CoordType.WGS84,vehicleType = VehicleType.FIRST, rpOption = RpOption.RECOMMENDED)
                     )
                 )
@@ -87,7 +73,7 @@ class CarRoute : AppCompatActivity() {
             else {
                 // 카카오내비가 설치되지 않았을 경우 웹에서 연결
                 val uri = NaviClient.instance.navigateWebUrl(
-                    Location("카카오 판교오피스", "127.108640", "37.402111"),
+                    Location(name=destname!!,x=destx!!,y=desty!!),
                     NaviOption(coordType = CoordType.WGS84),null
                 )
 
@@ -104,6 +90,7 @@ class CarRoute : AppCompatActivity() {
             }
         }
     }
+
     fun expectedtimetoString(intseconds:Int): String {
         val seconds : Long = intseconds.toLong()
         val day = TimeUnit.SECONDS.toDays(seconds).toInt()

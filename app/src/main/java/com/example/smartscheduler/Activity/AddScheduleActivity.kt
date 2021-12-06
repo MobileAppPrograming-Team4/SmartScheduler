@@ -2,22 +2,13 @@ package com.example.smartscheduler.Activity
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Dialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.TextUtils
 import android.util.Log
-import android.view.View
-import android.view.Window
 import android.widget.*
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.smartscheduler.*
 import com.example.smartscheduler.Database.ScheduleInfo
 import java.util.*
@@ -27,16 +18,11 @@ import com.odsay.odsayandroidsdk.ODsayData;
 import com.odsay.odsayandroidsdk.ODsayService;
 import com.odsay.odsayandroidsdk.OnResultCallbackListener;
 import kotlinx.android.synthetic.main.activity_addschedule.*
-import net.daum.mf.map.api.MapView
 
 import org.json.JSONObject;
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import kotlin.concurrent.thread
-import kotlin.properties.Delegates
 import java.util.concurrent.TimeUnit
 
 class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.CompleteListener {
@@ -45,6 +31,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     lateinit var destination: TextView
     lateinit var cal: Calendar
     lateinit var transportGroup: RadioGroup
+    lateinit var carRadioButton : RadioButton
     lateinit var searchButton: ImageButton
     lateinit var expectedtime1 : TextView
     var startHour = 0
@@ -65,6 +52,9 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     var sleepAlarmHour:Int? = null
     var sleepAlarmMinute:Int? = null
     var isSleepAlarmOn = false
+    var duration = 0
+    lateinit var origin : String
+    lateinit var dest : String
 
     lateinit var odsayService: ODsayService
     lateinit var jsonObject: JSONObject
@@ -133,7 +123,10 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 }
                 R.id.car -> {
                     transportType = 1
-                    setCarTime()
+                    carRadioButton = findViewById(R.id.car)
+                    carRadioButton.setOnClickListener{
+                        setCarTime()
+                    }
                 }
                 R.id.walk -> {
                     transportType = 2
@@ -319,14 +312,34 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         val userLatitude = userInfo.getString("userLatitude","")           //출발지 위도
         val userLongitude = userInfo.getString("userLongitude","")         //출발지 경도
 
-        var origin : String = (userLongitude+","+userLatitude)  //출발지 좌표
-        var destination : String = (destLongitude.toString()+","+destLatitude.toString()) //목적지 좌표
+        origin = (userLongitude+","+userLatitude)  //출발지 좌표
+        dest = (destLongitude.toString()+","+destLatitude.toString()) //목적지 좌표
+
+        val destInfo: SharedPreferences = getSharedPreferences("destInfo", MODE_PRIVATE)
+        val editor: SharedPreferences.Editor = destInfo.edit()
+
+        editor.putString("destname",destName)
+        editor.putString("destx",destLongitude.toString())
+        editor.putString("desty",destLatitude.toString())
+        editor.apply()
+
+        expectedtime1 = findViewById(R.id.expectedtime1)
+
+        if(origin.equals("0.0,0.0") && dest.equals("0.0,0.0")){
+            expectedtime1.setText("목적지와 출발지가 설정되지 않았습니다.")
+            return 0
+        }
+        if(origin.equals("0.0,0.0")){
+            expectedtime1.setText("출발지가 설정되지 않았습니다.")
+            return 0
+        }
+        if(dest.equals("0.0,0.0")){
+            expectedtime1.setText("목적지가 설정되지 않았습니다.")
+            return 0
+        }
 
         val api = kakaonaviAPI.create()
-        val callGetSearchCarRoute = api.getSearchCarRoute(CarRoute.API_KEY,origin,destination)
-
-        var text:String
-        var tmp:Int = 0
+        val callGetSearchCarRoute = api.getSearchCarRoute(CarRoute.API_KEY,origin,dest)
 
         callGetSearchCarRoute.enqueue(object : Callback<ResultCarRouteSearch> {
             override fun onResponse(
@@ -335,18 +348,17 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             ) {
                 Log.d("결과","성공 : ${response.raw()}")
                 Log.d("결과","성공 : ${response.body()}")
-                tmp = response.body()!!.routes[0].summary.duration
-                text = expectedtimetoString(tmp)
+                duration = response.body()!!.routes[0].summary.duration
+                expectedtime1.setText(expectedtimetoString(response.body()!!.routes[0].summary.duration))
+                //duration - 예상 소요시간을 초단위로 받아오기때문에 출력에 적합한 포맷으로 바꾼후
 
-                expectedtime1 = findViewById(R.id.expectedtime1)
-                expectedtime1.setText(text)
             }
             override fun onFailure(call: Call<ResultCarRouteSearch>, t: Throwable) {
                 Log.d("결과","실패 : ${t.message}")
             }
         })
 
-        return tmp
+        return duration
     }
 
     //Int형의 초 단위 에상 소요 시간을 포맷에 맞춰 계산
