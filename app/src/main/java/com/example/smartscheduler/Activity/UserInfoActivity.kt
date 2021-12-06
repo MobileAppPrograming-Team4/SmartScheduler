@@ -8,18 +8,15 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.*
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.smartscheduler.R
 import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
-import android.widget.TextView
 import android.location.LocationManager
 import android.os.Build
 import android.util.Log
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -191,7 +188,12 @@ class UserInfoActivity : AppCompatActivity(), MapView.CurrentLocationEventListen
             editor.putString("userLongitude", tmpLongitude.toString())
             editor.apply()
 
-            gotoMain()
+            if(tmpLatitude==0.0 && tmpLongitude==0.0){
+                Toast.makeText(this, "앱 사용을 위해 기본 출발 장소를 설정해주세요", Toast.LENGTH_LONG).show()
+            }
+            else{
+                gotoMain()
+            }
 
         }
 
