@@ -1,6 +1,8 @@
 package com.example.smartscheduler.Activity
 
 import android.content.Context
+import android.app.Activity
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -20,9 +22,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 class WalkRouteActivity : AppCompatActivity() {
-
-    lateinit var depPlace: TextView
-    lateinit var arrivalPlace: TextView
     lateinit var totalTime: TextView
     lateinit var totalDistance: TextView
 
@@ -35,8 +34,14 @@ class WalkRouteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_walkroute)
 
-        depPlace = findViewById<TextView>(R.id.walkDepPlace)
-        arrivalPlace = findViewById<TextView>(R.id.walkArrivalPlace)
+        val getIntent = getIntent()
+        val arriX = getIntent.getDoubleExtra("x", 0.0)
+        val arriY = getIntent.getDoubleExtra("y", 0.0)
+
+        val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
+        val depX = userInfo.getString("userLongitude", null)
+        val depY = userInfo.getString("userLatitude", null)
+
         totalTime = findViewById<TextView>(R.id.walkTime)
         totalDistance = findViewById<TextView>(R.id.walkLength)
 
@@ -50,11 +55,8 @@ class WalkRouteActivity : AppCompatActivity() {
         tmapView.mapType = TMapView.MAPTYPE_STANDARD
         tmapView.setLanguage(TMapView.LANGUAGE_KOREAN)
 
-        depPlace.setText("경북대학교 테니스장")
-        arrivalPlace.setText("경북대학교 중앙도서관")
-
-        var walkDep = TMapPoint(35.88902720456651, 128.61027824041773)
-        var walkArrival = TMapPoint(35.89113011991111, 128.6119321645856)
+        var walkDep = TMapPoint(depY!!.toDouble(), depX!!.toDouble())
+        var walkArrival = TMapPoint(arriY, arriX)
 
         tmapView.setCenterPoint(128.61027824041773, 35.88902720456651);
 
@@ -63,13 +65,13 @@ class WalkRouteActivity : AppCompatActivity() {
         var url = "https://apis.openapi.sk.com/tmap/routes/pedestrian?"
         val client = OkHttpClient()
 
-        url += "startX=128.61027824041773"
-        url += "&startY=35.88902720456651"
-        url += "&endX=128.6119321645856"
-        url += "&endY=35.89113011991111"
+        url += "startX=" + depX
+        url += "&startY=" + depY
+        url += "&endX=" + arriX.toString()
+        url += "&endY=" + arriY.toString()
         url += "&reqCoordType=WGS84GEO"
-        url += "&startName=" + URLEncoder.encode("경북대학교 테니스장", "UTF-8")
-        url += "&endName=" + URLEncoder.encode("경북대학교 중앙도서관", "UTF-8")
+        url += "&startName=" + URLEncoder.encode("시작", "UTF-8")
+        url += "&endName=" + URLEncoder.encode("끝", "UTF-8")
         url += "&searchOption=0&resCoordType=WGS84GEO"
 
         val request = Request.Builder()

@@ -360,8 +360,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun goToRoute(scheduleInfo: ScheduleInfo?, year: Int?, month: Int?, date: Int?) {
-        val intent = Intent(this, WalkRouteActivity::class.java)
-        startActivity(intent)
+        if (scheduleInfo!!.transportation == 0) {
+            val intent = Intent(this, PublicRouteActivity::class.java)
+            intent.putExtra("x",scheduleInfo!!.schedulePlace_x_double)
+            intent.putExtra("y",scheduleInfo!!.schedulePlace_y_double)
+            startActivity(intent)
+        }
+        else if (scheduleInfo!!.transportation == 2) {
+            val intent = Intent(this, WalkRouteActivity::class.java)
+            intent.putExtra("x",scheduleInfo!!.schedulePlace_x_double)
+            intent.putExtra("y",scheduleInfo!!.schedulePlace_y_double)
+            startActivity(intent)
+        }
     }
 
     fun goToCarRoute(scheduleInfo: ScheduleInfo?) {

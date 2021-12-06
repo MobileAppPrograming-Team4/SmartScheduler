@@ -1,7 +1,9 @@
 package com.example.smartscheduler.Activity
 
 import android.content.Context
+import android.app.Activity
 import android.graphics.Color
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,9 +22,6 @@ import org.json.JSONObject;
 // import net.daum.mf.map.api.MapView
 
 class PublicRouteActivity : AppCompatActivity() {
-
-    lateinit var depPlace: TextView
-    lateinit var arrivalPlace: TextView
     lateinit var totalTime: TextView
     lateinit var startAndFinal: TextView
     lateinit var stationCount: TextView
@@ -40,19 +39,22 @@ class PublicRouteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_publicroute)
 
+        val getIntent = getIntent()
+        val arriX = getIntent.getDoubleExtra("x", 0.0)
+        val arriY = getIntent.getDoubleExtra("y", 0.0)
+
+        val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
+        val depX = userInfo.getString("userLongitude", null)
+        val depY = userInfo.getString("userLatitude", null)
+
         val listView = findViewById<ListView>(R.id.publicRouteListView)
 
-        depPlace = findViewById<TextView>(R.id.publicDepPlace)
-        arrivalPlace = findViewById<TextView>(R.id.publicArrivalPlace)
         totalTime = findViewById<TextView>(R.id.publicTime)
         startAndFinal = findViewById<TextView>(R.id.startAndFinal)
         stationCount = findViewById<TextView>(R.id.stationCount)
 
         // map = findViewById(R.id.publicRouteKakaoMapView)
         // map.addView(mapView)
-
-        depPlace.setText("경북대학교")
-        arrivalPlace.setText("대구광역시청")
 
         odsayService = ODsayService.init(
             this@PublicRouteActivity,
@@ -62,10 +64,10 @@ class PublicRouteActivity : AppCompatActivity() {
         odsayService.setReadTimeout(5000)
 
         odsayService.requestSearchPubTransPath(
-            "128.61027824041773",
-            "35.88902720456651",
-            "128.6017393692533",
-            "35.87155237703856",
+            depX.toString(),
+            depY.toString(),
+            arriY.toString(),
+            arriX.toString(),
             null,
             null,
             null,
