@@ -283,7 +283,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun goToRoute(scheduleInfo: ScheduleInfo?, year: Int?, month: Int?, date: Int?) {
-        val intent = Intent(this, PublicRouteActivity::class.java)
+        val intent = Intent(this, WalkRouteActivity::class.java)
         startActivity(intent)
     }
 

@@ -18,6 +18,13 @@ import com.odsay.odsayandroidsdk.ODsayData;
 import com.odsay.odsayandroidsdk.ODsayService;
 import com.odsay.odsayandroidsdk.OnResultCallbackListener;
 
+import com.skt.Tmap.*
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import java.net.URLEncoder
+import java.io.IOException
+
+import org.json.JSONArray
 import org.json.JSONObject;
 
 class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.CompleteListener {
@@ -250,5 +257,9 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         )
 
         return totalTime
+    }
+
+    private fun setWalkTime(): Int {
+
     }
 }
