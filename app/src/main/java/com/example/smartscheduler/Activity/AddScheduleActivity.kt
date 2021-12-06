@@ -95,7 +95,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
         searchButton.setOnClickListener {
             val intent = Intent(this, DestinationSearchActivity::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, 0)
 
 
         }
