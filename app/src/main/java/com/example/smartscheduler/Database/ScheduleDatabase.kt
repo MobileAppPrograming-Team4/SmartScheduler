@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = arrayOf(ScheduleInfo::class), version = 4)
+@Database(entities = arrayOf(ScheduleInfo::class), version = 5)
 abstract class ScheduleDatabase : RoomDatabase() {
     //데이터베이스를 매번 생성하는건 리소스를 많이 사용하므로 싱글톤 권장
     abstract fun scheduleInfoDao(): ScheduleInfoDao
@@ -31,6 +31,7 @@ abstract class ScheduleDatabase : RoomDatabase() {
                     .addMigrations(MIGRATION_1_2) //addMigrations 추가
                     .addMigrations(MIGRATION_2_3)
                     .addMigrations(MIGRATION_3_4)
+                    .addMigrations(MIGRATION_4_5)
                     .build()
                 INSTANCE = instance
                 instance
@@ -59,6 +60,12 @@ abstract class ScheduleDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE 'schedule_database' ADD COLUMN 'schedule_place_x_double' DOUBLE")
                 database.execSQL("ALTER TABLE 'schedule_database' ADD COLUMN 'schedule_place_y_double' DOUBLE")
+            }
+        }
+        // 일정 장소 주소 추가
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE 'schedule_database' ADD COLUMN 'schedulePlace_name' TEXT")
             }
         }
     }

@@ -195,11 +195,12 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                     isAlarmOn,
                     sleepAlarmHour,
                     sleepAlarmMinute,
-                    isSleepAlarmOn
+                    isSleepAlarmOn,
+                    destName
                 )
                 Log.d(
                     "Addschedule",
-                    "${scheduleExplain.text}, ${year}, ${month}, ${date}, ${startHour}:${startMinute},${transportType},${isAlarmOn}"
+                    "${scheduleExplain.text}, ${year}, ${month}, ${date}, ${startHour}:${startMinute},${transportType},${isAlarmOn},${destName}"
                 )
                 val intent = Intent()
                 intent.putExtra("scheduleInfo", scheduleInfo)

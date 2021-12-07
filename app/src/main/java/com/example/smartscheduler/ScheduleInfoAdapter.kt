@@ -7,10 +7,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.PopupMenu
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -36,6 +33,7 @@ class ScheduleInfoAdapter(context: Context) :
         var alarmOn: ImageView
         var alarm_hour_minute: TextView
         var scheduleExplain: TextView
+        var schedulePlace_layout: LinearLayout
 
 
         init {
@@ -45,6 +43,7 @@ class ScheduleInfoAdapter(context: Context) :
             alarmOn = scheduleItem.findViewById(R.id.alarmOn)
             alarm_hour_minute = scheduleItem.findViewById(R.id.alarm_hour_minute)
             scheduleExplain = scheduleItem.findViewById(R.id.scheduleExplain)
+            schedulePlace_layout = scheduleItem.findViewById(R.id.schedulePlace_layout)
         }
     }
 
@@ -77,6 +76,12 @@ class ScheduleInfoAdapter(context: Context) :
             viewHolder.alarm_hour_minute.text = "OFF"
         }
         viewHolder.scheduleExplain.text = schedule.scheduleExplain
+        if(schedule.schedulePlace_name != null){
+            viewHolder.schedulePlace_layout.visibility = View.VISIBLE
+            viewHolder.schedulePlace_layout.findViewById<TextView>(R.id.schedulePlace).text = schedule.schedulePlace_name
+        }else{
+            viewHolder.schedulePlace_layout.visibility = View.GONE
+        }
 
     }
 

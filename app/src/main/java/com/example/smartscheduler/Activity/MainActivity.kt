@@ -276,6 +276,7 @@ class MainActivity : AppCompatActivity() {
             .setFirstDayOfWeek(Calendar.SUNDAY)          // 일주일 시작을 일요일으로
             .setCalendarDisplayMode(CalendarMode.MONTHS) // 달력 모드: 월
             .commit()
+        calendarView.isDynamicHeightEnabled = true //달력 높이를 동적으로 조절
         calendarView.setTitleFormatter {
             val titleFormat =
                 SimpleDateFormat("yyyy년 MM월")
