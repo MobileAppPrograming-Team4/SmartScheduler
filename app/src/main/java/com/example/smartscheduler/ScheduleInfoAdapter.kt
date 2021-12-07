@@ -122,10 +122,6 @@ class ScheduleInfoAdapter(context: Context) :
                 notifyItemRemoved(position)
                 true
             }
-            R.id.carroute->{
-                this.scheduleClickListener.carroute(position)
-                true
-            }
             else -> false
         }
     }
