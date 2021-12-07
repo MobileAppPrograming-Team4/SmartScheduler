@@ -74,8 +74,8 @@ class DestinationSearchActivity : AppCompatActivity() {
                 destName = listItems[position].name
                 destAddress = listItems[position].address
                 destRoad = listItems[position].road
-                destLatitude = listItems[position].y
                 destLongitude = listItems[position].x
+                destLatitude = listItems[position].y
 
             }
         })
@@ -107,8 +107,8 @@ class DestinationSearchActivity : AppCompatActivity() {
             outintent.putExtra("destName", destName)
             outintent.putExtra("destAddress", destName)
             outintent.putExtra("destName", destName)
-            outintent.putExtra("destLatitude", destLatitude)
             outintent.putExtra("destLongitude", destLongitude)
+            outintent.putExtra("destLatitude", destLatitude)
             Log.d("newdestination : ", "name : $destName \n address : $destAddress \n road : $destRoad \n lat : $destLatitude \n long : $destLongitude" )
             setResult(Activity.RESULT_OK, outintent)
             finish()

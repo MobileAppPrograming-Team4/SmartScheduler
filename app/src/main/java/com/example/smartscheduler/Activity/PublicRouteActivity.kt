@@ -1,8 +1,6 @@
 package com.example.smartscheduler.Activity
 
-import android.content.Context
 import android.app.Activity
-import android.graphics.Color
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.smartscheduler.*
 
 import com.odsay.odsayandroidsdk.API;
@@ -19,7 +16,6 @@ import com.odsay.odsayandroidsdk.ODsayService;
 import com.odsay.odsayandroidsdk.OnResultCallbackListener;
 
 import org.json.JSONObject;
-// import net.daum.mf.map.api.MapView
 
 class PublicRouteActivity : AppCompatActivity() {
     lateinit var totalTime: TextView
@@ -30,10 +26,6 @@ class PublicRouteActivity : AppCompatActivity() {
 
     lateinit var odsayService: ODsayService
     lateinit var jsonObject_path: JSONObject
-    // lateinit var jsonObject_lane: JSONObject
-
-    // lateinit var map: ConstraintLayout
-    // val mapView = MapView(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,18 +36,14 @@ class PublicRouteActivity : AppCompatActivity() {
         val arriY = getIntent.getDoubleExtra("y", 0.0)
 
         val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
-        val depX = userInfo.getFloat("userLatitude", 0.0f)
-        val depY = userInfo.getFloat("userLongitude", 0.0f)
+        val depX = userInfo.getFloat("userLongitude", 0.0f)
+        val depY = userInfo.getFloat("userLatitude", 0.0f)
 
         val listView = findViewById<ListView>(R.id.publicRouteListView)
 
         totalTime = findViewById<TextView>(R.id.publicTime)
         startAndFinal = findViewById<TextView>(R.id.startAndFinal)
         stationCount = findViewById<TextView>(R.id.stationCount)
-
-        // map = findViewById(R.id.publicRouteKakaoMapView)
-        // map.addView(mapView)
-
 
         // ODSay 초기화
         odsayService = ODsayService.init(
@@ -69,8 +57,8 @@ class PublicRouteActivity : AppCompatActivity() {
         odsayService.requestSearchPubTransPath(
             depX.toString(),
             depY.toString(),
-            arriY.toString(),
             arriX.toString(),
+            arriY.toString(),
             null,
             null,
             null,
@@ -84,11 +72,6 @@ class PublicRouteActivity : AppCompatActivity() {
                     val pathInfo = firstPath.getJSONObject("info")
 
                     totalTime.setText(pathInfo.getInt("totalTime").toString() + "분")
-
-                    // val mapObject = pathInfo.getString("mabObj")
-
-                    // publicRouteView(mapObject)
-
                     startAndFinal.setText(pathInfo.getString("firstStartStation") + "→" + pathInfo.getString("lastEndStation"))
                     stationCount.setText(pathInfo.getInt("totalStationCount").toString() + "개 정류장(역) 이동")
 
@@ -143,44 +126,6 @@ class PublicRouteActivity : AppCompatActivity() {
             }
         )
     }
-
-    /*
-    private fun publicRouteView(mabObject: String) {
-        odsayService.requestLoadLane(
-            mabObject,
-            object : OnResultCallbackListener {
-                override fun onSuccess(odsayData: ODsayData?, api: API?) {
-                    jsonObject_lane = odsayData!!.json
-
-                    val laneResult = jsonObject_lane.getJSONObject("result")
-                    val laneArray = laneResult.getJSONArray("lane")
-                    val firstSection = laneArray.getJSONObject(0)
-                    val graphArray = firstSection.getJSONArray("graphPos")
-
-                    val polyline = MapPolyline()
-                    polyline.setTag(1000)
-                    polyline.setLineColor(Color.argb(128, 255, 51, 0))
-
-                    for (i in 0 until graphArray.length()) {
-                        val coordinate = graphArray.getJSONObject(i)
-
-                        polyline.addPoint(MapPoint.mapPointWithGeoCoord(coordinate.getDouble("y"), coordinate.getDouble("x")));
-                    }
-
-                    mapView.addPolyline(polyline);
-
-                    val mapPointBounds = MapPointBounds(polyline.getMapPoints())
-                    val padding = 100
-                    mMapView.moveCamera(CameraUpdateFactory.newMapPointBounds(mapPointBounds, padding));
-                }
-
-                override fun onError(code: Int, message: String, api: API) {
-                    totalTime.setText(api.name + " 호출 실패")
-                }
-            }
-        )
-    }
-    */
 
     private class MyCustomAdapter(private val items: MutableList<ListViewItem>) : BaseAdapter() {
         override fun getCount(): Int {

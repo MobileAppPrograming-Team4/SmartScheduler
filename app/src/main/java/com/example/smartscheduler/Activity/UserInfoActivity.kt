@@ -42,9 +42,6 @@ class UserInfoActivity : AppCompatActivity() {
     var startpointRoad: String? = null
     var startpointLatitude: Double = 0.0
     var startpointLongitude: Double = 0.0
-    var tmpLatitude: Double = 0.0
-    var tmpLongitude: Double = 0.0
-
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -110,8 +107,8 @@ class UserInfoActivity : AppCompatActivity() {
                 sleepTime = Integer.parseInt(sleepTimeEditText.text.toString())
                 editor.putInt("readyTime", readyTime)
                 editor.putInt("sleepTime", sleepTime)
-                editor.putFloat("userLatitude", startpointLatitude.toFloat())
                 editor.putFloat("userLongitude", startpointLongitude.toFloat())
+                editor.putFloat("userLatitude", startpointLatitude.toFloat())
                 editor.apply()
 
                 Log.d(
@@ -143,8 +140,8 @@ class UserInfoActivity : AppCompatActivity() {
             startpointName = data!!.getStringExtra("startpointName")
             startpointAddress = data!!.getStringExtra("startpointAddress")
             startpointRoad = data!!.getStringExtra("startpointRoad")
-            startpointLatitude = data!!.getDoubleExtra("startpointLatitude", 0.0)
             startpointLongitude = data!!.getDoubleExtra("startpointLongitude", 0.0)
+            startpointLatitude = data!!.getDoubleExtra("startpointLatitude", 0.0)
             Log.d(
                 "newdestination : ",
                 "받은 로그 name : $startpointName \n address : $startpointAddress \n road : $startpointRoad \n lat : $startpointLatitude \n long : $startpointLongitude"

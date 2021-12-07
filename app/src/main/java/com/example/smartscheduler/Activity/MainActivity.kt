@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var selectedDateTextView: TextView
     private lateinit var addSchedule: Button
     private lateinit var calendarView: com.prolificinteractive.materialcalendarview.MaterialCalendarView
+    lateinit var calendarTitle: TextView
     private lateinit var settingBt : ImageButton
     var currentYear: Int? = null  //오늘 년
     var currentMonth: Int? = null //오늘 월
@@ -315,6 +316,7 @@ class MainActivity : AppCompatActivity() {
         if(selectedDate != null) { //달력 아래 선택한 날짜 TextView
             selectedDateTextView.text="${selectedYear}년 ${selectedMonth}월 ${selectedDate}일"
         }else{ // 달력 제목 TextView
+            calendarTitle = findViewById(R.id.calendarTitle)
             calendarTitle.text="${selectedYear}년 ${selectedMonth}월"
         }
     }
@@ -339,7 +341,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun carroute(position: Int){
             scheduleList = scheduleViewModel.currentData
-            goToCarRoute(scheduleList.value?.get(position)!!, selectedYear!!, selectedMonth!!, selectedDate!!)
+            goToCarRoute(scheduleList.value?.get(position)!!)
         }
     }
     fun addOrModify(scheduleInfo: ScheduleInfo?, year:Int?, month:Int?, date:Int?){
@@ -369,7 +371,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         else if (scheduleInfo!!.transportation == 1) { // 자동차
-            val intent = Intent(this, CarRoute::class.java)
+            val intent = Intent(this, CarRouteActivity::class.java)
             intent.putExtra("x",scheduleInfo!!.schedulePlace_x_double)
             intent.putExtra("y",scheduleInfo!!.schedulePlace_y_double)
             startActivity(intent)
@@ -383,7 +385,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun goToCarRoute(scheduleInfo: ScheduleInfo?) {
-        val intent = Intent(this, CarRoute::class.java)
+        val intent = Intent(this, CarRouteActivity::class.java)
         intent.putExtra("x",scheduleInfo!!.schedulePlace_x_double)
         intent.putExtra("y",scheduleInfo!!.schedulePlace_y_double)
         startActivity(intent)

@@ -2,22 +2,14 @@ package com.example.smartscheduler.Activity
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Dialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
 import android.text.TextUtils
 import android.util.Log
-import android.view.View
-import android.view.Window
 import android.widget.*
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.smartscheduler.*
 import com.example.smartscheduler.Database.ScheduleInfo
 import java.util.*
@@ -27,34 +19,22 @@ import com.odsay.odsayandroidsdk.ODsayData
 import com.odsay.odsayandroidsdk.ODsayService
 import com.odsay.odsayandroidsdk.OnResultCallbackListener
 import kotlinx.android.synthetic.main.activity_addschedule.*
-import net.daum.mf.map.api.MapView
-
-import com.skt.Tmap.*
-//import okhttp3.*
-//import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.net.URLEncoder
-import java.io.IOException
-
-import org.json.JSONArray
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import kotlin.concurrent.thread
-import kotlin.properties.Delegates
 import java.util.concurrent.TimeUnit
 
 class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.CompleteListener {
     lateinit var startTimeTextView: TextView
     lateinit var finishTimeTextView: TextView
-    lateinit var destination: TextView
     lateinit var cal: Calendar
     lateinit var transportGroup: RadioGroup
     lateinit var searchButton: ImageButton
     lateinit var expectedtimeTextView : TextView
     lateinit var expectedtime1: TextView
+    lateinit var carRadioButton: RadioButton
     var startHour = 0
     var startMinute = 0
     var finishHour = 0
@@ -68,8 +48,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     var destName: String? = null
     var destAddress: String? = null
     var destRoad: String? = null
-    var destLatitude: Double? = 0.0
     var destLongitude: Double? = 0.0
+    var destLatitude: Double? = 0.0
     var sleepAlarmHour: Int? = null
     var sleepAlarmMinute: Int? = null
     var isSleepAlarmOn = false
@@ -116,12 +96,6 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 finishMinute = 59
             }
         }
-
-//        searchButton.setOnClickListener {
-//            searchKeyword(location.text.toString())
-//            val intent = Intent(this, DestinationSearchActivity::class.java)
-//            intent.putExtra("destination", placeList)
-//        }
 
         searchButton.setOnClickListener {
             val intent = Intent(this, DestinationSearchActivity::class.java)
@@ -191,8 +165,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                     finishMinute,
                     null, //수정 금지(int형)
                     null, //수정 금지(int형)
-                    destLatitude, //좌표 입력(double)
                     destLongitude, //좌표 입력(double)
+                    destLatitude, //좌표 입력(double)
                     transportType,
                     totalTime,
                     alarmHour,
@@ -292,8 +266,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         odsayService.setReadTimeout(5000)
 
         odsayService.requestSearchPubTransPath(
-            depY.toString(),
             depX.toString(),
+            depY.toString(),
             destLongitude.toString(),
             destLatitude.toString(),
             null,
@@ -310,7 +284,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
                     totalTime = pathInfo.getInt("totalTime")
 
-                    expectedtime1 = findViewById(R.id.expectedtime1)
+                    expectedtime1 = findViewById(R.id.expectedtimeTextView)
                     expectedtime1.setText(totalTime.toString() + "분")
                 }
 
@@ -345,8 +319,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             "application/json",
             tmapKey,
             "application/json; charset=UTF-8",
-            startY.toString(),
             startX.toString(),
+            startY.toString(),
             endX,
             endY,
             reqCoordType,
@@ -372,7 +346,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 totalTime = (tmp / 60) + 1
 
                 myHandler.post {
-                    expectedtime1 = findViewById(R.id.expectedtime1)
+                    expectedtime1 = findViewById(R.id.expectedtimeTextView)
                     expectedtime1.setText(totalTime.toString() + "분")
                 }
             }
@@ -383,28 +357,28 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         })
     }
 
-    //자동차 예상 소요 시간을 계산 후, 초 단위로 duration에 저장, 리턴
-    private fun setCarTime(): Int{
+    //자동차 예상 소요 시간을 계산 후, 초 단위로 totalTime에 저장, 리턴
+    private fun setCarTime(){
 
         val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
-        val userLatitude = userInfo.getString("userLatitude","")           //출발지 위도
-        val userLongitude = userInfo.getString("userLongitude","")         //출발지 경도
+        val userLongitude = userInfo.getFloat("userLongitude",0.0f)         //출발지 경도
+        val userLatitude = userInfo.getFloat("userLatitude",0.0f)           //출발지 위도
 
-        origin = (userLongitude+","+userLatitude)  //출발지 좌표
-        dest = (destLongitude.toString()+","+destLatitude.toString()) //목적지 좌표
+        var origin = (userLongitude.toString() + "," + userLatitude.toString())  //출발지 좌표
+        var dest = (destLongitude.toString() + "," + destLatitude.toString()) //목적지 좌표
 
         expectedtimeTextView = findViewById(R.id.expectedtimeTextView)
         if(origin.equals("0.0,0.0") && dest.equals("0.0,0.0")){
             expectedtimeTextView.setText("목적지와 출발지가 설정되지 않았습니다.")
-            return 0
+            return
         }
         if(origin.equals("0.0,0.0")){
             expectedtimeTextView.setText("출발지가 설정되지 않았습니다.")
-            return 0
+            return
         }
         if(dest.equals("0.0,0.0")){
             expectedtimeTextView.setText("목적지가 설정되지 않았습니다.")
-            return 0
+            return
         }
 
         val api = kakaonaviAPI.create()
@@ -417,7 +391,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             ) {
                 Log.d("결과","성공 : ${response.raw()}")
                 Log.d("결과","성공 : ${response.body()}")
-                duration = response.body()!!.routes[0].summary.duration
+                totalTime = response.body()!!.routes[0].summary.duration / 60
+
                 expectedtimeTextView.setText(expectedtimetoString(response.body()!!.routes[0].summary.duration))
                 //duration(예상소요시간)을 초단위로 받아오기때문에 출력에 적합한 포맷으로 바꾼 후 텍스트뷰에 넣음
             }
@@ -425,7 +400,6 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 Log.d("결과","실패 : ${t.message}")
             }
         })
-        return duration
     }
 
     //Int형의 초 단위 에상 소요 시간을 포맷에 맞춰 계산
@@ -446,8 +420,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             destName = data!!.getStringExtra("destName")
             destAddress = data!!.getStringExtra("destAddress")
             destRoad = data!!.getStringExtra("destRoad")
-            destLatitude = data!!.getDoubleExtra("destLatitude", 0.0)
             destLongitude = data!!.getDoubleExtra("destLongitude", 0.0)
+            destLatitude = data!!.getDoubleExtra("destLatitude", 0.0)
             locationText.setText("위치 : " + destName)
             Log.d(
                 "newdestination : ",

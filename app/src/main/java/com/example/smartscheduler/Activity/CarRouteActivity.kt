@@ -13,18 +13,16 @@ import com.kakao.sdk.navi.model.*
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.util.KakaoCustomTabsClient
 import com.kakao.sdk.navi.model.Location
+import net.daum.mf.map.api.MapPOIItem
+import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.util.concurrent.TimeUnit
 
 class CarRouteActivity : AppCompatActivity() {
     lateinit var map: ConstraintLayout
     lateinit var startNaviBtn : Button
     lateinit var destBtn : ImageButton
-    var destx : Double = 0.0
     var desty : Double = 0.0
+    var destx : Double = 0.0
 
     companion object {
         const val BASE_URL_KAKAONAVI_API = "https://apis-navi.kakaomobility.com"
@@ -73,9 +71,9 @@ class CarRouteActivity : AppCompatActivity() {
                 //startActivity(Intent(ACTION_VIEW, uri))
 
                 // 또는 웹뷰로 앱 내에서 내비 실행 -> 현재 웹뷰 스펙 문제로 불가능한 것으로 보임
-//                var intent = Intent(this, CarNavigationActivity::class.java)
-//                intent.putExtra("uri",uri.toString())
-//                startActivity(intent)
+                // var intent = Intent(this, CarNavigationActivity::class.java)
+                // intent.putExtra("uri",uri.toString())
+                // startActivity(intent)
             }
         }
 

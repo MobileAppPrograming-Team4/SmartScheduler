@@ -91,8 +91,8 @@ class StartpointSearchActivity : AppCompatActivity(), MapView.CurrentLocationEve
                 startpointName = listItems[position].name
                 startpointAddress = listItems[position].address
                 startpointRoad = listItems[position].road
-                startpointLatitude = listItems[position].x
-                startpointLongitude = listItems[position].y
+                startpointLongitude = listItems[position].x
+                startpointLatitude = listItems[position].y
 
                 Log.d(
                     "item 선택 : ",
@@ -109,8 +109,8 @@ class StartpointSearchActivity : AppCompatActivity(), MapView.CurrentLocationEve
                 startpointName = xyListItems[position].name
                 startpointAddress = xyListItems[position].address
                 startpointRoad = xyListItems[position].road
-                startpointLatitude = xyListItems[position].x
-                startpointLongitude = xyListItems[position].y
+                startpointLongitude = xyListItems[position].x
+                startpointLatitude = xyListItems[position].y
             }
         })
 
@@ -182,11 +182,11 @@ class StartpointSearchActivity : AppCompatActivity(), MapView.CurrentLocationEve
                 Log.d("lat,lng : ", "Lat : $startpointLatitude, Long : $startpointLongitude")
                 pageNumber = 1
 
-                getAddress(startpointLatitude, startpointLongitude)
+                getAddress(startpointLongitude, startpointLatitude)
                 addItemsAndMarkersforXY(mapView,
                     addressName.toString(), startpointLatitude, startpointLongitude)
 
-                setDaumMapCurrentLocation(startpointLatitude, startpointLongitude, mapView)
+                setDaumMapCurrentLocation(startpointLongitude, startpointLatitude, mapView)
 
                 startpointName = addressName
                 startpointAddress = addressName
@@ -200,8 +200,8 @@ class StartpointSearchActivity : AppCompatActivity(), MapView.CurrentLocationEve
             outintent.putExtra("startpointName", startpointName)
             outintent.putExtra("startpointAddress", startpointName)
             outintent.putExtra("startpointRoad", startpointRoad)
-            outintent.putExtra("startpointLatitude", startpointLatitude)
             outintent.putExtra("startpointLongitude", startpointLongitude)
+            outintent.putExtra("startpointLatitude", startpointLatitude)
             Log.d(
                 "newdestination : ",
                 "name : $startpointName \n address : $startpointAddress \n road : $startpointRoad \n lat : $startpointLatitude \n long : $startpointLongitude"
@@ -212,14 +212,14 @@ class StartpointSearchActivity : AppCompatActivity(), MapView.CurrentLocationEve
         }
     }
 
-    private fun getAddress(latitude: Double, longitude: Double) {
+    private fun getAddress(longitude: Double, latitude: Double) {
         val geoCoder = Geocoder(this@StartpointSearchActivity, Locale.getDefault())
         val address = geoCoder.getFromLocation(latitude, longitude, 1).first().getAddressLine(0)
         addressName = address
         Log.e("Address", address)
     }
 
-    fun setDaumMapCurrentLocation(latitude: Double, longitude: Double, mapView: MapView) {
+    fun setDaumMapCurrentLocation(longitude: Double, latitude: Double, mapView: MapView) {
 
         // 중심점 변경
         mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude), true)
@@ -250,36 +250,6 @@ class StartpointSearchActivity : AppCompatActivity(), MapView.CurrentLocationEve
             MapPOIItem.MarkerType.RedPin // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
         mapView.addPOIItem(marker)
     }
-
-
-//    private fun searchLatlng(Lat: Double, Long: Double, mapView: MapView) {
-//        val retrofit = Retrofit.Builder()   // Retrofit 구성
-//            .baseUrl(AddScheduleActivity.BASE_URL)
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
-//        val api = retrofit.create(kakaoAPI::class.java)   // 통신 인터페이스를 객체로 생성
-//        val call = api.getSearchLatLng(StartpointSearchActivity.API_KEY, Lat, Long)
-//
-//        // API 서버에 요청
-//        call.enqueue(object : Callback<xySearchResult> {
-//            override fun onResponse(
-//                call: Call<xySearchResult>,
-//                response: Response<xySearchResult>
-//            ) {
-//                // 통신 성공 (검색 결과는 response.body()에 담겨있음)
-//                Log.d("Test", "Raw: ${response.raw()}")
-//                Log.d("Test", "Body: ${response.body()}")
-//                addItemsAndMarkersforXY(response.body(), mapView, Lat, Long)
-//                xyPlaceList = response.body()
-//            }
-//
-//            override fun onFailure(call: Call<xySearchResult>, t: Throwable) {
-//                // 통신 실패
-//                Log.w("MainActivity", "통신 실패: ${t.message}")
-//            }
-//        })
-//
-//    }
 
     private fun searchKeyword(keyword: String, page: Int, mapView: MapView) {
         val retrofit = Retrofit.Builder()   // Retrofit 구성
@@ -368,7 +338,7 @@ class StartpointSearchActivity : AppCompatActivity(), MapView.CurrentLocationEve
         val point = MapPOIItem()
         point.apply {
             itemName = Address
-            mapPoint = MapPoint.mapPointWithGeoCoord(Longitude, Latitude)
+            mapPoint = MapPoint.mapPointWithGeoCoord(Latitude, Longitude)
             markerType = MapPOIItem.MarkerType.BluePin
             selectedMarkerType = MapPOIItem.MarkerType.RedPin
         }
@@ -376,9 +346,6 @@ class StartpointSearchActivity : AppCompatActivity(), MapView.CurrentLocationEve
         listAdapter.notifyDataSetChanged()
         xyListAdapter.notifyDataSetChanged()
     }
-
-
-
 
     override fun onCurrentLocationUpdate(p0: MapView?, p1: MapPoint?, p2: Float) {
         TODO("Not yet implemented")
