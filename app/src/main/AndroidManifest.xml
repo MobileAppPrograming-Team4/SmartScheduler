@@ -38,8 +38,11 @@
         </activity>
         <activity android:name=".Activity.AddScheduleActivity"/>
         <activity android:name=".Activity.PublicRouteActivity"/>
+        <activity android:name=".Activity.WalkRouteActivity"/>
         <activity android:name=".Activity.CarRoute"/>
         <activity android:name=".Activity.CarNavigation"/>
+        <activity android:name=".Activity.DestinationSearchActivity"/>
+        <activity android:name=".Activity.StartpointSearchActivity"/>
 
 <!--카카오맵 네이티브 앱 key-->
         <meta-data android:name="com.kakao.sdk.AppKey" android:value="5f9edbd5b9db541446f51c121146a651"/>

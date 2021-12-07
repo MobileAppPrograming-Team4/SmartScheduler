@@ -7,10 +7,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.PopupMenu
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -24,7 +21,6 @@ class ScheduleInfoAdapter(context: Context) :
     private var scheduleList = emptyList<ScheduleInfo>()
     private var alarmOnColor =
         ContextCompat.getColor(context, R.color.yellow)
-        //ContextCompat.getColor(context, R.color.design_default_color_secondary)
     private lateinit var scheduleClickListener: OnScheduleClickListener
     val context:Context = context
     /**
@@ -33,21 +29,21 @@ class ScheduleInfoAdapter(context: Context) :
      */
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var scheduleItem: CardView
-        var startHour: TextView
-        var gubun: TextView //" : "
-        var startMinute: TextView
+        var start_finish_time: TextView
         var alarmOn: ImageView
+        var alarm_hour_minute: TextView
         var scheduleExplain: TextView
+        var schedulePlace_layout: LinearLayout
 
 
         init {
             // Define click listener for the ViewHolder's View.
             scheduleItem = view.findViewById(R.id.scheduleItem)
-            startHour = scheduleItem.findViewById(R.id.startHour)
-            gubun = scheduleItem.findViewById(R.id.gubun)
-            startMinute = scheduleItem.findViewById(R.id.startMinute)
+            start_finish_time = scheduleItem.findViewById(R.id.start_finish_time)
             alarmOn = scheduleItem.findViewById(R.id.alarmOn)
+            alarm_hour_minute = scheduleItem.findViewById(R.id.alarm_hour_minute)
             scheduleExplain = scheduleItem.findViewById(R.id.scheduleExplain)
+            schedulePlace_layout = scheduleItem.findViewById(R.id.schedulePlace_layout)
         }
     }
 
@@ -67,15 +63,26 @@ class ScheduleInfoAdapter(context: Context) :
             showPopup(v, position)
         }
         val schedule = scheduleList[position]
-        viewHolder.startHour.text = schedule.scheduleStartHour.toString()
+        viewHolder.start_finish_time.text = "${schedule.scheduleStartHour}:${schedule.scheduleStartMinute} ~ ${schedule.scheduleFinishHour}:${schedule.scheduleFinishMinute}"
         if (schedule.setAlarm) {
             viewHolder.alarmOn.setColorFilter(alarmOnColor, PorterDuff.Mode.SRC_IN)
+            if(schedule.alarmHour!! < 0){
+                viewHolder.alarm_hour_minute.text = "하루 전 ${schedule.alarmHour!! +24}:${schedule.alarmMinute}"
+            }else {
+                viewHolder.alarm_hour_minute.text = "${schedule.alarmHour}:${schedule.alarmMinute}"
+            }
         } else {
             viewHolder.alarmOn.setColorFilter(null)
+            viewHolder.alarm_hour_minute.text = "OFF"
         }
-        viewHolder.gubun.text = " : "
-        viewHolder.startMinute.text = schedule.scheduleStartMinute.toString()
         viewHolder.scheduleExplain.text = schedule.scheduleExplain
+        if(schedule.schedulePlace_name != null){
+            viewHolder.schedulePlace_layout.visibility = View.VISIBLE
+            viewHolder.schedulePlace_layout.findViewById<TextView>(R.id.schedulePlace).text = schedule.schedulePlace_name
+        }else{
+            viewHolder.schedulePlace_layout.visibility = View.GONE
+        }
+
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -112,6 +119,7 @@ class ScheduleInfoAdapter(context: Context) :
             R.id.delete->{
                 this.scheduleClickListener.delete(position)
                 Toast.makeText(context, "일정을 삭제했습니다", Toast.LENGTH_LONG).show()
+                notifyItemRemoved(position)
                 true
             }
             R.id.carroute->{
