@@ -33,7 +33,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     lateinit var transportGroup: RadioGroup
     lateinit var carRadioButton : RadioButton
     lateinit var searchButton: ImageButton
-    lateinit var expectedtime1 : TextView
+    lateinit var expectedtimeTextView : TextView
     var startHour = 0
     var startMinute = 0
     var finishHour = 0
@@ -304,42 +304,30 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
     //자동차 예상 소요 시간을 계산 후, 초 단위로 duration에 저장, 리턴
     private fun setCarTime(): Int{
-        val BASE_URL_KAKAONAVI_API = "https://apis-navi.kakaomobility.com"
-        val API_KEY = "KakaoAK 28f1a9b662dea4d3296bfaa59f4590b3"
 
         val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
-
         val userLatitude = userInfo.getString("userLatitude","")           //출발지 위도
         val userLongitude = userInfo.getString("userLongitude","")         //출발지 경도
 
         origin = (userLongitude+","+userLatitude)  //출발지 좌표
         dest = (destLongitude.toString()+","+destLatitude.toString()) //목적지 좌표
 
-        val destInfo: SharedPreferences = getSharedPreferences("destInfo", MODE_PRIVATE)
-        val editor: SharedPreferences.Editor = destInfo.edit()
-
-        editor.putString("destname",destName)
-        editor.putString("destx",destLongitude.toString())
-        editor.putString("desty",destLatitude.toString())
-        editor.apply()
-
-        expectedtime1 = findViewById(R.id.expectedtime1)
-
+        expectedtimeTextView = findViewById(R.id.expectedtimeTextView)
         if(origin.equals("0.0,0.0") && dest.equals("0.0,0.0")){
-            expectedtime1.setText("목적지와 출발지가 설정되지 않았습니다.")
+            expectedtimeTextView.setText("목적지와 출발지가 설정되지 않았습니다.")
             return 0
         }
         if(origin.equals("0.0,0.0")){
-            expectedtime1.setText("출발지가 설정되지 않았습니다.")
+            expectedtimeTextView.setText("출발지가 설정되지 않았습니다.")
             return 0
         }
         if(dest.equals("0.0,0.0")){
-            expectedtime1.setText("목적지가 설정되지 않았습니다.")
+            expectedtimeTextView.setText("목적지가 설정되지 않았습니다.")
             return 0
         }
 
         val api = kakaonaviAPI.create()
-        val callGetSearchCarRoute = api.getSearchCarRoute(CarRoute.API_KEY,origin,dest)
+        val callGetSearchCarRoute = api.getSearchCarRoute(API_KEY,origin,dest)
 
         callGetSearchCarRoute.enqueue(object : Callback<ResultCarRouteSearch> {
             override fun onResponse(
@@ -349,15 +337,13 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 Log.d("결과","성공 : ${response.raw()}")
                 Log.d("결과","성공 : ${response.body()}")
                 duration = response.body()!!.routes[0].summary.duration
-                expectedtime1.setText(expectedtimetoString(response.body()!!.routes[0].summary.duration))
+                expectedtimeTextView.setText(expectedtimetoString(response.body()!!.routes[0].summary.duration))
                 //duration(예상소요시간)을 초단위로 받아오기때문에 출력에 적합한 포맷으로 바꾼 후 텍스트뷰에 넣음
-
             }
             override fun onFailure(call: Call<ResultCarRouteSearch>, t: Throwable) {
                 Log.d("결과","실패 : ${t.message}")
             }
         })
-
         return duration
     }
 

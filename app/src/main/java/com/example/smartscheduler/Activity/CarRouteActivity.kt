@@ -23,7 +23,7 @@ import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
 
 
-class CarRoute : AppCompatActivity() {
+class CarRouteActivity : AppCompatActivity() {
     lateinit var map: ConstraintLayout
     lateinit var startNaviBtn : Button
     lateinit var destBtn : ImageButton
@@ -38,7 +38,6 @@ class CarRoute : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_carroute)
-
         KakaoSdk.init(this, "5f9edbd5b9db541446f51c121146a651")
 
         val getIntent = getIntent()
@@ -89,7 +88,7 @@ class CarRoute : AppCompatActivity() {
                 //startActivity(Intent(ACTION_VIEW, uri))
 
                 // 또는 웹뷰로 앱 내에서 내비 실행 -> 현재 웹뷰 스펙 문제로 불가능한 것으로 보임
-//                var intent = Intent(this, CarNavigation::class.java)
+//                var intent = Intent(this, CarNavigationActivity::class.java)
 //                intent.putExtra("uri",uri.toString())
 //                startActivity(intent)
             }

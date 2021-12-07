@@ -14,7 +14,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.Window
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
@@ -27,7 +26,6 @@ import com.example.smartscheduler.*
 import com.example.smartscheduler.Database.ScheduleInfo
 import com.example.smartscheduler.Database.ScheduleViewModel
 import com.example.smartscheduler.Decorator.*
-import com.kakao.sdk.common.KakaoSdk
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.CalendarMode
 import java.text.SimpleDateFormat
@@ -360,13 +358,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun goToRoute(scheduleInfo: ScheduleInfo?, year: Int?, month: Int?, date: Int?) {
-        val intent = Intent(this, CarRoute::class.java)
+        val intent = Intent(this, CarRouteActivity::class.java)
         startActivity(intent)
     }
 
     //차량 네비게이션 시작 화면으로 이동
     fun goToCarRoute(scheduleInfo: ScheduleInfo?, year: Int?, month: Int?, date: Int?) {
-        val intent = Intent(this, CarRoute::class.java)
+        val intent = Intent(this, CarRouteActivity::class.java)
         intent.putExtra("x",scheduleInfo!!.schedulePlace_x_double)
         intent.putExtra("y",scheduleInfo!!.schedulePlace_y_double)
         startActivity(intent)
