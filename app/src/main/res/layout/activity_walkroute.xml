@@ -50,7 +50,7 @@
                         android:textSize="14sp" />
 
                     <TextView
-                        android:id="@+id/publicTime"
+                        android:id="@+id/walkTime"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
@@ -62,35 +62,10 @@
 
             </androidx.cardview.widget.CardView>
 
-            <!-- 지도 이미지
+            <!-- 이동 거리 -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:cardCornerRadius="30dp"
-                android:layout_marginBottom="15dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    android:orientation="vertical"
-                    android:layout_margin="10dp">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/publicRouteKakaoMapView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginTop="20dp"
-                        app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-            -->
-
-            <!-- 이동 노선 -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
                 app:cardCornerRadius="30dp">
 
@@ -98,44 +73,42 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_margin="15dp"
-                    android:orientation="vertical">
+                    android:orientation="horizontal">
 
                     <TextView
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingBottom="10dp"
-                        android:gravity="center"
-                        android:text="이동 노선"
+                        android:paddingRight="5dp"
+                        android:gravity="left"
+                        android:text="이동 거리"
                         android:textSize="14sp" />
 
                     <TextView
-                        android:id="@+id/startAndFinal"
+                        android:id="@+id/walkLength"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="출발 정류장 → 도착 정류장"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/stationCount"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="20dp"
-                        android:gravity="center"
-                        android:text="0개 정류장(역) 이동"
-                        android:textSize="14sp" />
-
-                    <ListView
-                        android:id="@+id/publicRouteListView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:dividerHeight="0px"
-                        android:divider="#FFFFFF"
-                        android:listSelector="@android:color/transparent"
-                        >
-                    </ListView>
+                        android:text="0m"
+                        android:textSize="18sp" />
 
 
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- 지도 이미지-->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:cardCornerRadius="30dp"
+                android:layout_marginBottom="15dp">
+
+                <LinearLayout
+                    android:id="@+id/walkTmapView"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:orientation="vertical"
+                    android:layout_margin="10dp">
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>

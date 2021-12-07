@@ -74,8 +74,11 @@ dependencies {
     implementation "androidx.work:work-runtime-ktx:2.5.0"
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation files('libs/libDaumMapAndroid.jar')
+    implementation "com.squareup.okhttp3:okhttp:4.9.0"
     implementation "com.kakao.sdk:v2-navi:2.8.3"
     // Google cloud platform
     implementation "com.google.android.gms:play-services-location:17.0.0"
     implementation "com.google.android.gms:play-services-maps:17.0.0"
+    // t map
+    implementation files('..\\libs\\com.skt.Tmap_1.70.jar')
 }

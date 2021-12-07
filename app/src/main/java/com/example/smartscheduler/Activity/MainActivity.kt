@@ -36,6 +36,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     lateinit var selectedDateTextView: TextView
+    lateinit var calendarTitle: TextView
     private lateinit var addSchedule: Button
     private lateinit var calendarView: com.prolificinteractive.materialcalendarview.MaterialCalendarView
     private lateinit var settingBt : ImageButton
@@ -76,7 +77,7 @@ class MainActivity : AppCompatActivity() {
         */
         selectedDateTextView = findViewById(R.id.todayTextView)
         calendarView = findViewById(R.id.calendarView)
-
+        calendarTitle = findViewById(R.id.calendarTitle)
 
         scheduleViewModel = ViewModelProvider(this).get(ScheduleViewModel::class.java)
 
@@ -276,17 +277,14 @@ class MainActivity : AppCompatActivity() {
             .setFirstDayOfWeek(Calendar.SUNDAY)          // 일주일 시작을 일요일으로
             .setCalendarDisplayMode(CalendarMode.MONTHS) // 달력 모드: 월
             .commit()
-        calendarView.setTitleFormatter {
-            val titleFormat =
-                SimpleDateFormat("yyyy년 MM월")
-            titleFormat.format(calendarView.selectedDate.date)
-        }
+        calendarView.topbarVisible = false // 달력 제목 안보이게
         selectedYear = calendarView.selectedDate.year
         selectedMonth = calendarView.selectedDate.month + 1
         selectedDate = calendarView.selectedDate.date.date
         scheduleViewModel.getAllDate(selectedYear!!, selectedMonth!!, selectedDate!!)
         scheduleViewModel.getAllMonth(selectedYear!!, selectedMonth!!)
         showDate(selectedYear!!, selectedMonth!!, selectedDate!!)
+        showDate(selectedYear!!, selectedMonth!!, null)
 
 
         val sundayDecorator = SundayDecorator()          //일요일 글자 색을 빨간색으로 변경
@@ -302,11 +300,7 @@ class MainActivity : AppCompatActivity() {
         }
         calendarView.setOnMonthChangedListener { widget, date ->
             Log.d("달력","달 변경")
-            calendarView.setTitleFormatter {
-                val titleFormat =
-                    SimpleDateFormat("yyyy년 MM월")
-                titleFormat.format(date.date)
-            }
+            showDate(date.year, date.month+1, null)
             scheduleViewModel.getAllMonth(date.year, date.month + 1)
         }
 
@@ -318,8 +312,12 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun showDate(selectedYear: Int, selectedMonth: Int, selectedDate: Int) {
-        selectedDateTextView.setText("${selectedYear}년 ${selectedMonth}월 ${selectedDate}일")
+    private fun showDate(selectedYear: Int, selectedMonth: Int, selectedDate: Int?) {
+        if(selectedDate != null) { //달력 아래 선택한 날짜 TextView
+            selectedDateTextView.text="${selectedYear}년 ${selectedMonth}월 ${selectedDate}일"
+        }else{ // 달력 제목 TextView
+            calendarTitle.text="${selectedYear}년 ${selectedMonth}월"
+        }
     }
 
     private var onScheduleListener:OnScheduleClickListener = object: OnScheduleClickListener{
@@ -342,7 +340,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun carroute(position: Int){
             scheduleList = scheduleViewModel.currentData
-            goToCarRoute(scheduleList.value?.get(position)!!, selectedYear!!, selectedMonth!!, selectedDate!!)
+            goToCarRoute(scheduleList.value?.get(position)!!)
         }
     }
     fun addOrModify(scheduleInfo: ScheduleInfo?, year:Int?, month:Int?, date:Int?){
@@ -352,7 +350,9 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("month", month!!)
             intent.putExtra("date", date!!)
             startActivityForResult(intent, ADD_SCHEDULE)
+
         }else{ // 일정 편집
+            Log.d("database 확인 ", "scheduleinfo : ${scheduleInfo!!.schedulePlace_x_double}")
             intent.putExtra("mode","modify")
             intent.putExtra("beforeModify",scheduleInfo)
             startActivityForResult(intent, MODIFY_SCHEDULE)
@@ -360,15 +360,33 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun goToRoute(scheduleInfo: ScheduleInfo?, year: Int?, month: Int?, date: Int?) {
-        val intent = Intent(this, CarRoute::class.java)
-        startActivity(intent)
+        // 이동수단에 따라 각각에 맞는 경로 안내 Activity로 이동
+        if (scheduleInfo!!.transportation == 0) { // 대중교통
+            val intent = Intent(this, PublicRouteActivity::class.java)
+//            println(scheduleInfo!!.schedulePlace_x_double)
+            Log.d("input 확인 ", "schedulePlace : ${scheduleInfo.schedulePlace_x_double}")
+            intent.putExtra("x",scheduleInfo!!.schedulePlace_x_double)
+            intent.putExtra("y",scheduleInfo!!.schedulePlace_y_double)
+            startActivity(intent)
+        }
+        else if (scheduleInfo!!.transportation == 1) { // 자동차
+            val intent = Intent(this, CarRoute::class.java)
+            intent.putExtra("x",scheduleInfo!!.schedulePlace_x_double)
+            intent.putExtra("y",scheduleInfo!!.schedulePlace_y_double)
+            startActivity(intent)
+        }
+        else if (scheduleInfo!!.transportation == 2) { // 도보
+            val intent = Intent(this, WalkRouteActivity::class.java)
+            intent.putExtra("x",scheduleInfo!!.schedulePlace_x_double)
+            intent.putExtra("y",scheduleInfo!!.schedulePlace_y_double)
+            startActivity(intent)
+        }
     }
 
-    fun goToCarRoute(scheduleInfo: ScheduleInfo?, year: Int?, month: Int?, date: Int?) {
+    fun goToCarRoute(scheduleInfo: ScheduleInfo?) {
         val intent = Intent(this, CarRoute::class.java)
         intent.putExtra("x",scheduleInfo!!.schedulePlace_x_double)
         intent.putExtra("y",scheduleInfo!!.schedulePlace_y_double)
-        //intent.putExtra("destname",scheduleInfo!!.schedulePlace_name)
         startActivity(intent)
     }
 

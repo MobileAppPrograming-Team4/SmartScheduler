@@ -5,35 +5,39 @@
       <map>
         <entry key="..\:/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_addschedule.xml" value="0.2644927536231884" />
         <entry key="..\:/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_main.xml" value="0.2644927536231884" />
+        <entry key="..\:/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_mapview.xml" value="0.24139492753623187" />
         <entry key="..\:/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_publicroute.xml" value="0.36614583333333334" />
         <entry key="..\:/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_userinfo.xml" value="0.2644927536231884" />
+        <entry key="..\:/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_walkroute.xml" value="0.3045977011494253" />
         <entry key="..\:/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/fragment_bottomsetschedule.xml" value="0.2644927536231884" />
+        <entry key="..\:/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/item_publicroute.xml" value="0.3374094202898551" />
         <entry key="..\:/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/item_schedule.xml" value="0.2644927536231884" />
         <entry key="..\:/AndroidStudioProjects/SmartScheduler/app/src/main/res/menu/schedule_modify_delete.xml" value="0.36614583333333334" />
-        <entry key="..\:/Users/dnjsr/Documents/GitHub/SmartScheduler/app/src/main/res/layout/activity_addschedule.xml" value="0.4" />
-        <entry key="..\:/Users/dnjsr/Documents/GitHub/SmartScheduler/app/src/main/res/layout/activity_carnavigation.xml" value="0.264" />
-        <entry key="..\:/Users/dnjsr/Documents/GitHub/SmartScheduler/app/src/main/res/layout/activity_carroute.xml" value="0.2318840579710145" />
-        <entry key="..\:/Users/dnjsr/Documents/GitHub/SmartScheduler/app/src/main/res/layout/activity_gps.xml" value="0.12708333333333333" />
-        <entry key="..\:/Users/dnjsr/Documents/GitHub/SmartScheduler/app/src/main/res/layout/activity_main.xml" value="0.264" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.17592592592592593" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/drawable/bg_bottomsheet_radius.xml" value="0.215625" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.215625" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/drawable/ic_baseline_alarm_on.xml" value="0.215625" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/drawable/ic_baseline_alarm_on_24.xml" value="0.215625" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/drawable/ic_baseline_crop_din_24.xml" value="0.215625" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/drawable/ic_baseline_location_on_24.xml" value="0.215625" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/drawable/ic_baseline_settings_24.xml" value="0.17592592592592593" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/drawable/radius.xml" value="0.1" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/drawable/selector_radio_text.xml" value="0.11851851851851852" />
-        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_addschedule.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_addschedule.xml" value="0.4466666666666667" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_calendar.xml" value="0.19947916666666668" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_main.xml" value="0.22" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_publicroute.xml" value="0.11730072463768115" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_test.xml" value="0.1" />
-        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_userinfo.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/activity_userinfo.xml" value="0.16847826086956522" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/bottom_setschedule.xml" value="0.1" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/destination_list_layout.xml" value="0.5" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/dialog_sleepalarm.xml" value="0.4466666666666667" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/fragment_bottomsetschedule.xml" value="0.18342391304347827" />
-        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/item_schedule.xml" value="0.1" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/item_schedule.xml" value="0.5" />
         <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/recyclerview_schedules.xml" value="0.4466666666666667" />
-        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/menu/schedule_modify_delete.xml" value="0.19947916666666668" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/layout/tmp_itiem.xml" value="0.4070138150903294" />
+        <entry key="..\:/Users/rladf/AndroidStudioProjects/SmartScheduler/app/src/main/res/menu/schedule_modify_delete.xml" value="0.6666666666666666" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.184375" />
         <entry key="app/src/main/res/drawable/bg_bottomsheet_radius.xml" value="0.184375" />
         <entry key="app/src/main/res/drawable/ic_baseline_alarm_on_24.xml" value="0.321025641025641" />
@@ -46,6 +50,10 @@
         <entry key="app/src/main/res/layout/activity_addschedule.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.3214876788063936" />
         <entry key="app/src/main/res/layout/activity_publicroute.xml" value="0.16822916666666668" />
+        <entry key="app/src/main/res/layout/activity_userinfo.xml" value="0.20199275362318841" />
+        <entry key="app/src/main/res/layout/activity_startpointsearch.xml" value="0.3918019990299666" />
+        <entry key="app/src/main/res/layout/activity_userinfo.xml" value="0.334973695046912" />
+        <entry key="app/src/main/res/layout/destination_list_layout.xml" value="0.3098958333333333" />
         <entry key="app/src/main/res/layout/activity_userinfo.xml" value="0.20199275362318841" />
         <entry key="app/src/main/res/layout/fragment_bottomsetschedule.xml" value="0.3098958333333333" />
         <entry key="app/src/main/res/layout/item_schedule.xml" value="0.3098958333333333" />

@@ -309,6 +309,8 @@
         android:layout_height="wrap_content"
         android:text="저장하기"
         android:backgroundTint="?attr/colorSecondaryVariant"
-        android:textColor="@color/black"/>
+        android:textColor="@color/black"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"/>
 
 </LinearLayout>
