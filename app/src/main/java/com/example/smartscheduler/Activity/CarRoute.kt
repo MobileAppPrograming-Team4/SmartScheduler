@@ -1,10 +1,7 @@
 package com.example.smartscheduler.Activity
 
-import android.content.Intent
-import android.content.Intent.ACTION_VIEW
 import android.os.Bundle
 import android.util.Log
-import android.webkit.WebView
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
@@ -13,18 +10,13 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.smartscheduler.R
 import com.kakao.sdk.navi.NaviClient
 import com.kakao.sdk.navi.model.*
-import com.kakao.sdk.*
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.util.KakaoCustomTabsClient
 import com.kakao.sdk.navi.model.Location
-import com.odsay.odsayandroidsdk.API
 import net.daum.mf.map.api.MapView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.converter.gson.GsonConverterFactory.*
 import java.util.concurrent.TimeUnit
 
 class CarRoute : AppCompatActivity() {

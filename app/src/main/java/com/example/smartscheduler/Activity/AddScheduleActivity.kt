@@ -2,22 +2,13 @@ package com.example.smartscheduler.Activity
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Dialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.TextUtils
 import android.util.Log
-import android.view.View
-import android.view.Window
 import android.widget.*
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.smartscheduler.*
 import com.example.smartscheduler.Database.ScheduleInfo
 import java.util.*
@@ -27,16 +18,11 @@ import com.odsay.odsayandroidsdk.ODsayData;
 import com.odsay.odsayandroidsdk.ODsayService;
 import com.odsay.odsayandroidsdk.OnResultCallbackListener;
 import kotlinx.android.synthetic.main.activity_addschedule.*
-import net.daum.mf.map.api.MapView
 
 import org.json.JSONObject;
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import kotlin.concurrent.thread
-import kotlin.properties.Delegates
 import java.util.concurrent.TimeUnit
 
 class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.CompleteListener {
@@ -161,13 +147,13 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
         findViewById<Button>(R.id.saveButton).setOnClickListener {
             // 저장하기 버튼을 누르면
-            // 1. 소요시간 계산
+            /*// 1. 소요시간 계산
             totalTime = when (transportType) {
                 0 -> setPublicTime()
                 1 -> 10
                 2 -> 10
                 else -> 0
-            }
+            }*/
             // 2. 출발 알람이 켜져있으면 알람이 울릴 시간 계산
             if(isAlarmOn){
                 calculateAlarmClock(totalTime!!)
@@ -313,16 +299,16 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     }
 
     //자동차 예상 소요 시간을 초 단위로 계산후 반환
-    private fun setCarTime(): Int{
+    private fun setCarTime(){
         val BASE_URL_KAKAONAVI_API = "https://apis-navi.kakaomobility.com"
         val API_KEY = "KakaoAK 28f1a9b662dea4d3296bfaa59f4590b3"
 
         val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
 
-        val userLatitude = userInfo.getString("userLatitude","")           //출발지 위도
-        val userLongitude = userInfo.getString("userLongitude","")         //출발지 경도
+        val userLatitude = userInfo.getFloat("userLatitude",0.0F)           //출발지 위도
+        val userLongitude = userInfo.getFloat("userLongitude",0.0F)         //출발지 경도
 
-        var origin : String = (userLongitude+","+userLatitude)  //출발지 좌표
+        var origin : String = ("$userLatitude,$userLongitude")  //출발지 좌표
         var destination : String = (destLongitude.toString()+","+destLatitude.toString()) //목적지 좌표
 
         val api = kakaonaviAPI.create()
@@ -340,16 +326,17 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 Log.d("결과","성공 : ${response.body()}")
                 tmp = response.body()!!.routes[0].summary.duration
                 text = expectedtimetoString(tmp)
+                val seconds : Long = tmp.toLong()
+                totalTime = TimeUnit.SECONDS.toMinutes(seconds).toInt() // 단위환산: 초 -> 분
 
                 expectedtime1 = findViewById(R.id.expectedtime1)
                 expectedtime1.setText(text)
             }
             override fun onFailure(call: Call<ResultCarRouteSearch>, t: Throwable) {
                 Log.d("결과","실패 : ${t.message}")
+                totalTime = 0
             }
         })
-
-        return tmp
     }
 
     //Int형의 초 단위 에상 소요 시간을 포맷에 맞춰 계산
