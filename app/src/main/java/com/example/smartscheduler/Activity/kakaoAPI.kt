@@ -19,8 +19,8 @@ interface kakaoAPI {
     @GET("v2/local/geo/transcoord.json")
     fun getSearchLatLng(
         @Header("Authorization") key: String,
-        @Query("x") Latitude: Double,
-        @Query("y") Longitude: Double
+        @Query("x") Longitude: Double,
+        @Query("y") Latitude: Double
     ): Call<xySearchResult>
 
 
