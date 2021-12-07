@@ -155,7 +155,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             // 1. 소요시간 계산
             totalTime = when (transportType) {
                 0 -> setPublicTime()
-                1 -> 10
+                1 -> setCarTime()
                 2 -> 10
                 else -> 0
             }

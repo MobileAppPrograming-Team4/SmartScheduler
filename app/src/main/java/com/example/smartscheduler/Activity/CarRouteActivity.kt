@@ -50,17 +50,6 @@ class CarRouteActivity : AppCompatActivity() {
         Log.d("y좌표","$desty")
         Log.d("장소 이름","$destname")
 
-        val mapView = MapView(this)
-        map = findViewById(R.id.clKakaoMapView)
-        map.addView(mapView)
-
-        setDaumMapDestLocation(desty,destx,mapView!!)       //일정장소 보여주기
-
-        destBtn = findViewById(R.id.DestinationButton)
-        destBtn.setOnClickListener{
-            setDaumMapDestLocation(desty,destx,mapView!!)   //버튼을 눌러 일정장소로 시점 이동
-        }
-
 
         //내비게이션 시작 버튼
         startNaviBtn = findViewById(R.id.startNaviBtn)
@@ -92,6 +81,17 @@ class CarRouteActivity : AppCompatActivity() {
 //                intent.putExtra("uri",uri.toString())
 //                startActivity(intent)
             }
+        }
+
+        val mapView = MapView(this)
+        map = findViewById(R.id.clKakaoMapView)
+        map.addView(mapView)
+
+        setDaumMapDestLocation(desty,destx,mapView!!)       //일정장소 보여주기
+
+        destBtn = findViewById(R.id.DestinationButton)
+        destBtn.setOnClickListener{
+            setDaumMapDestLocation(desty,destx,mapView!!)   //버튼을 눌러 일정장소로 시점 이동
         }
     }
 
