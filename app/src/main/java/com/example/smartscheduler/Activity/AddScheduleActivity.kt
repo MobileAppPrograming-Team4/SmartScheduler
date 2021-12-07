@@ -187,8 +187,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                     finishMinute,
                     null, //수정 금지(int형)
                     null, //수정 금지(int형)
-                    null, //좌표 입력(double)
-                    null, //좌표 입력(double)
+                    destLatitude, //좌표 입력(double)
+                    destLongitude, //좌표 입력(double)
                     transportType,
                     totalTime,
                     alarmHour,
@@ -196,11 +196,12 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                     isAlarmOn,
                     sleepAlarmHour,
                     sleepAlarmMinute,
-                    isSleepAlarmOn
+                    isSleepAlarmOn,
+                    destName
                 )
                 Log.d(
                     "Addschedule",
-                    "${scheduleExplain.text}, ${year}, ${month}, ${date}, ${startHour}:${startMinute},${transportType},${isAlarmOn}"
+                    "${scheduleExplain.text}, ${year}, ${month}, ${date}, ${startHour}:${startMinute},${transportType},${isAlarmOn},${destName}"
                 )
                 val intent = Intent()
                 intent.putExtra("scheduleInfo", scheduleInfo)
@@ -276,8 +277,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     private fun setPublicTime(): Unit {
         val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
 
-        val depX = userInfo.getString("userLongitude","")
-        val depY = userInfo.getString("userLatitude","")
+        val depX = userInfo.getFloat("userLongitude",0.0f)
+        val depY = userInfo.getFloat("userLatitude",0.0f)
 
         odsayService = ODsayService.init(
             this,
@@ -287,8 +288,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         odsayService.setReadTimeout(5000)
 
         odsayService.requestSearchPubTransPath(
-            depX.toString(),
             depY.toString(),
+            depX.toString(),
             destLongitude.toString(),
             destLatitude.toString(),
             null,
@@ -319,47 +320,47 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     }
 
     private fun setWalkTime(): Unit {
-        println("얘도 괜찮?")
-
-        val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
-
-        val depX = userInfo.getString("userLongitude","")
-        val depY = userInfo.getString("userLatitude","")
-
-        val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
-
-        var url = "https://apis.openapi.sk.com/tmap/routes/pedestrian?"
-        val client = OkHttpClient()
-
-        url += "startX=" + depX
-        url += "&startY=" + depY
-        url += "&endX=" + destLongitude.toString()
-        url += "&endY=" + destLatitude.toString()
-        url += "&reqCoordType=WGS84GEO"
-        url += "&startName=" + URLEncoder.encode("출발", "UTF-8")
-        url += "&endName=" + URLEncoder.encode("도착", "UTF-8")
-        url += "&searchOption=0&resCoordType=WGS84GEO"
-
-        val request = Request.Builder()
-            .header("Accept", "application/json")
-            .addHeader("appKey", tmapKey)
-            .addHeader("Content-Type", "application/json; charset=UTF-8")
-            .url(url)
-            .build()
-
-        val response = client.newCall(request).execute()
-        val data = response.body?.string()
-
-        val jsonObj = JSONObject(data)
-        val featureArray = jsonObj.getJSONArray("features")
-        val firstFeature = featureArray.getJSONObject(0)
-        val property = firstFeature.getJSONObject("properties")
-        val walkTime = (property.getInt("totalTime") / 60) + 1
-
-        totalTime = walkTime
-
-        expectedtime1 = findViewById(R.id.expectedtime1)
-        expectedtime1.setText(totalTime.toString() + "분")
+//        println("얘도 괜찮?")
+//
+//        val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
+//
+//        val depX = userInfo.getFloat("userLongitude", 0.0f)
+//        val depY = userInfo.getFloat("userLatitude", 0.0f)
+//
+//        val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
+//
+//        var url = "https://apis.openapi.sk.com/tmap/routes/pedestrian?"
+//        val client = OkHttpClient()
+//
+//        url += "startX=" + depX
+//        url += "&startY=" + depY
+//        url += "&endX=" + destLongitude.toString()
+//        url += "&endY=" + destLatitude.toString()
+//        url += "&reqCoordType=WGS84GEO"
+//        url += "&startName=" + URLEncoder.encode("출발", "UTF-8")
+//        url += "&endName=" + URLEncoder.encode("도착", "UTF-8")
+//        url += "&searchOption=0&resCoordType=WGS84GEO"
+//
+//        val request = Request.Builder()
+//            .header("Accept", "application/json")
+//            .addHeader("appKey", tmapKey)
+//            .addHeader("Content-Type", "application/json; charset=UTF-8")
+//            .url(url)
+//            .build()
+//
+//        val response = client.newCall(request).execute()
+//        val data = response.body?.string()
+//
+//        val jsonObj = JSONObject(data)
+//        val featureArray = jsonObj.getJSONArray("features")
+//        val firstFeature = featureArray.getJSONObject(0)
+//        val property = firstFeature.getJSONObject("properties")
+//        val walkTime = (property.getInt("totalTime") / 60) + 1
+//
+//        totalTime = walkTime
+//
+//        expectedtime1 = findViewById(R.id.expectedtime1)
+//        expectedtime1.setText(totalTime.toString() + "분")
 
         /*
         val response = client.newCall(request).enqueue(object : Callback {
@@ -382,11 +383,12 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             }
         })
 
+         */
         expectedtime1 = findViewById(R.id.expectedtime1)
         expectedtime1.setText(totalTime.toString() + "분")
         totalTime = 7
 
-         */
+
     }
 
     //자동차 예상 소요 시간을 초 단위로 계산후 반환
