@@ -62,7 +62,7 @@ abstract class ScheduleDatabase : RoomDatabase() {
                 database.execSQL("ALTER TABLE 'schedule_database' ADD COLUMN 'schedule_place_y_double' DOUBLE")
             }
         }
-        // 일정 장소 주소 추가
+        // 일정 장소 이름 추가
         val MIGRATION_4_5 = object : Migration(4, 5) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE 'schedule_database' ADD COLUMN 'schedulePlace_name' TEXT")
