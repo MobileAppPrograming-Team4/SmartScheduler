@@ -53,6 +53,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     lateinit var cal: Calendar
     lateinit var transportGroup: RadioGroup
     lateinit var searchButton: ImageButton
+    lateinit var expectedtimeTextView : TextView
     lateinit var expectedtime1: TextView
     var startHour = 0
     var startMinute = 0
@@ -140,7 +141,10 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 }
                 R.id.car -> {
                     transportType = 1
-                    // setCarTime()
+                    carRadioButton = findViewById(R.id.car)
+                    carRadioButton.setOnClickListener{
+                        setCarTime()        //자동차 선택시 예상소요시간에 시간출력
+                    }
                 }
                 R.id.walk -> {
                     transportType = 2
@@ -165,7 +169,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             // 1. 소요시간 계산
             when (transportType) {
                 0 -> setPublicTime()
-                1 -> totalTime = 10
+                1 -> setCarTime()
                 2 -> setWalkTime()
                 else -> 0
             }
@@ -379,46 +383,49 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         })
     }
 
-    //자동차 예상 소요 시간을 초 단위로 계산후 반환
-    private fun setCarTime(){
-        val BASE_URL_KAKAONAVI_API = "https://apis-navi.kakaomobility.com"
-        val API_KEY = "KakaoAK 28f1a9b662dea4d3296bfaa59f4590b3"
+    //자동차 예상 소요 시간을 계산 후, 초 단위로 duration에 저장, 리턴
+    private fun setCarTime(): Int{
 
         val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
+        val userLatitude = userInfo.getString("userLatitude","")           //출발지 위도
+        val userLongitude = userInfo.getString("userLongitude","")         //출발지 경도
 
-        val userLatitude = userInfo.getFloat("userLatitude",0.0F)           //출발지 위도
-        val userLongitude = userInfo.getFloat("userLongitude",0.0F)         //출발지 경도
+        origin = (userLongitude+","+userLatitude)  //출발지 좌표
+        dest = (destLongitude.toString()+","+destLatitude.toString()) //목적지 좌표
 
-        var origin : String = ("$userLatitude,$userLongitude")  //출발지 좌표
-        var destination : String = (destLongitude.toString()+","+destLatitude.toString()) //목적지 좌표
+        expectedtimeTextView = findViewById(R.id.expectedtimeTextView)
+        if(origin.equals("0.0,0.0") && dest.equals("0.0,0.0")){
+            expectedtimeTextView.setText("목적지와 출발지가 설정되지 않았습니다.")
+            return 0
+        }
+        if(origin.equals("0.0,0.0")){
+            expectedtimeTextView.setText("출발지가 설정되지 않았습니다.")
+            return 0
+        }
+        if(dest.equals("0.0,0.0")){
+            expectedtimeTextView.setText("목적지가 설정되지 않았습니다.")
+            return 0
+        }
 
         val api = kakaonaviAPI.create()
-        val callGetSearchCarRoute = api.getSearchCarRoute(CarRoute.API_KEY, origin, destination)
-
-        var text: String
-        var tmp: Int = 0
+        val callGetSearchCarRoute = api.getSearchCarRoute(API_KEY,origin,dest)
 
         callGetSearchCarRoute.enqueue(object : Callback<ResultCarRouteSearch> {
             override fun onResponse(
                 call: Call<ResultCarRouteSearch>,
                 response: Response<ResultCarRouteSearch>
             ) {
-                Log.d("결과", "성공 : ${response.raw()}")
-                Log.d("결과", "성공 : ${response.body()}")
-                tmp = response.body()!!.routes[0].summary.duration
-                text = expectedtimetoString(tmp)
-                val seconds : Long = tmp.toLong()
-                totalTime = TimeUnit.SECONDS.toMinutes(seconds).toInt() // 단위환산: 초 -> 분
-
-                expectedtime1 = findViewById(R.id.expectedtime1)
-                expectedtime1.setText(text)
+                Log.d("결과","성공 : ${response.raw()}")
+                Log.d("결과","성공 : ${response.body()}")
+                duration = response.body()!!.routes[0].summary.duration
+                expectedtimeTextView.setText(expectedtimetoString(response.body()!!.routes[0].summary.duration))
+                //duration(예상소요시간)을 초단위로 받아오기때문에 출력에 적합한 포맷으로 바꾼 후 텍스트뷰에 넣음
             }
-
             override fun onFailure(call: Call<ResultCarRouteSearch>, t: Throwable) {
                 Log.d("결과","실패 : ${t.message}")
-                totalTime = 0
             }
         })
+        return duration
     }
 
     //Int형의 초 단위 에상 소요 시간을 포맷에 맞춰 계산

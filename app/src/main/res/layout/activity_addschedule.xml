@@ -256,7 +256,7 @@
                         android:textSize="14sp" />
 
                     <TextView
-                        android:id="@+id/expectedtime1"
+                        android:id="@+id/expectedtimeTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"

@@ -6,7 +6,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.example.smartscheduler.R
 
-class CarNavigation : AppCompatActivity() {
+class CarNavigationActivity : AppCompatActivity() {
     lateinit var web: WebView
     lateinit var endnaviBtn: Button
 

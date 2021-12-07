@@ -36,7 +36,6 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     lateinit var selectedDateTextView: TextView
-    lateinit var calendarTitle: TextView
     private lateinit var addSchedule: Button
     private lateinit var calendarView: com.prolificinteractive.materialcalendarview.MaterialCalendarView
     private lateinit var settingBt : ImageButton
@@ -77,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         */
         selectedDateTextView = findViewById(R.id.todayTextView)
         calendarView = findViewById(R.id.calendarView)
-        calendarTitle = findViewById(R.id.calendarTitle)
+
 
         scheduleViewModel = ViewModelProvider(this).get(ScheduleViewModel::class.java)
 
@@ -340,7 +339,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun carroute(position: Int){
             scheduleList = scheduleViewModel.currentData
-            goToCarRoute(scheduleList.value?.get(position)!!)
+            goToCarRoute(scheduleList.value?.get(position)!!, selectedYear!!, selectedMonth!!, selectedDate!!)
         }
     }
     fun addOrModify(scheduleInfo: ScheduleInfo?, year:Int?, month:Int?, date:Int?){

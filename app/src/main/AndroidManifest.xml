@@ -39,8 +39,8 @@
         <activity android:name=".Activity.AddScheduleActivity"/>
         <activity android:name=".Activity.PublicRouteActivity"/>
         <activity android:name=".Activity.WalkRouteActivity"/>
-        <activity android:name=".Activity.CarRoute"/>
-        <activity android:name=".Activity.CarNavigation"/>
+        <activity android:name=".Activity.CarRouteActivity"/>
+        <activity android:name=".Activity.CarNavigationActivity"/>
         <activity android:name=".Activity.DestinationSearchActivity"/>
         <activity android:name=".Activity.StartpointSearchActivity"/>
 
