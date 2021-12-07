@@ -168,7 +168,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 1 -> totalTime = 10
                 2 -> setWalkTime()
                 else -> 0
-            }
+            }*/
             // 2. 출발 알람이 켜져있으면 알람이 울릴 시간 계산
             if (isAlarmOn) {
                 calculateAlarmClock(totalTime!!)
@@ -380,18 +380,17 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     }
 
     //자동차 예상 소요 시간을 초 단위로 계산후 반환
-    private fun setCarTime(): Int {
+    private fun setCarTime(){
         val BASE_URL_KAKAONAVI_API = "https://apis-navi.kakaomobility.com"
         val API_KEY = "KakaoAK 28f1a9b662dea4d3296bfaa59f4590b3"
 
         val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
 
-        val userLatitude = userInfo.getString("userLatitude", "")           //출발지 위도
-        val userLongitude = userInfo.getString("userLongitude", "")         //출발지 경도
+        val userLatitude = userInfo.getFloat("userLatitude",0.0F)           //출발지 위도
+        val userLongitude = userInfo.getFloat("userLongitude",0.0F)         //출발지 경도
 
-        var origin: String = (userLongitude + "," + userLatitude)  //출발지 좌표
-        var destination: String =
-            (destLongitude.toString() + "," + destLatitude.toString()) //목적지 좌표
+        var origin : String = ("$userLatitude,$userLongitude")  //출발지 좌표
+        var destination : String = (destLongitude.toString()+","+destLatitude.toString()) //목적지 좌표
 
         val api = kakaonaviAPI.create()
         val callGetSearchCarRoute = api.getSearchCarRoute(CarRoute.API_KEY, origin, destination)
@@ -408,17 +407,18 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 Log.d("결과", "성공 : ${response.body()}")
                 tmp = response.body()!!.routes[0].summary.duration
                 text = expectedtimetoString(tmp)
+                val seconds : Long = tmp.toLong()
+                totalTime = TimeUnit.SECONDS.toMinutes(seconds).toInt() // 단위환산: 초 -> 분
 
                 expectedtime1 = findViewById(R.id.expectedtime1)
                 expectedtime1.setText(text)
             }
 
             override fun onFailure(call: Call<ResultCarRouteSearch>, t: Throwable) {
-                Log.d("결과", "실패 : ${t.message}")
+                Log.d("결과","실패 : ${t.message}")
+                totalTime = 0
             }
         })
-
-        return tmp
     }
 
     //Int형의 초 단위 에상 소요 시간을 포맷에 맞춰 계산

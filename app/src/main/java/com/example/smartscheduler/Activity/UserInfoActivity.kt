@@ -85,7 +85,6 @@ class UserInfoActivity : AppCompatActivity() {
         if (readyTime > 0 && sleepTime > 0) {
             // 정보를 설정한 적이 있다면 activity_userinfo.xml을 보여주지 않음
             gotoMain()
-            finish()
         }
 
         searchButton = findViewById(R.id.searchBtn)

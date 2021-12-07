@@ -350,7 +350,9 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("month", month!!)
             intent.putExtra("date", date!!)
             startActivityForResult(intent, ADD_SCHEDULE)
+
         }else{ // 일정 편집
+            Log.d("database 확인 ", "scheduleinfo : ${scheduleInfo!!.schedulePlace_x_double}")
             intent.putExtra("mode","modify")
             intent.putExtra("beforeModify",scheduleInfo)
             startActivityForResult(intent, MODIFY_SCHEDULE)
