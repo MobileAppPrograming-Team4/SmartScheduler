@@ -36,12 +36,12 @@ class WalkRouteActivity : AppCompatActivity() {
         setContentView(R.layout.activity_walkroute)
 
         val getIntent = getIntent()
-        val arriX = getIntent.getDoubleExtra("x", 0.0)
-        val arriY = getIntent.getDoubleExtra("y", 0.0)
+        val arriY = getIntent.getDoubleExtra("x", 0.0)
+        val arriX = getIntent.getDoubleExtra("y", 0.0)
 
         val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
-        val depX = userInfo.getFloat("userLongitude", 0.0f)
-        val depY = userInfo.getFloat("userLatitude", 0.0f)
+        val depY = userInfo.getFloat("userLongitude", 0.0f)
+        val depX = userInfo.getFloat("userLatitude", 0.0f)
 
         totalTime = findViewById<TextView>(R.id.walkTime)
         totalDistance = findViewById<TextView>(R.id.walkLength)

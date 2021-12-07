@@ -30,8 +30,8 @@ import kotlinx.android.synthetic.main.activity_addschedule.*
 import net.daum.mf.map.api.MapView
 
 import com.skt.Tmap.*
-import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
+//import okhttp3.*
+//import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.net.URLEncoder
 import java.io.IOException
 
@@ -53,7 +53,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     lateinit var cal: Calendar
     lateinit var transportGroup: RadioGroup
     lateinit var searchButton: ImageButton
-    lateinit var expectedtime1 : TextView
+    lateinit var expectedtime1: TextView
     var startHour = 0
     var startMinute = 0
     var finishHour = 0
@@ -69,14 +69,14 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     var destRoad: String? = null
     var destLatitude: Double? = 0.0
     var destLongitude: Double? = 0.0
-    var sleepAlarmHour:Int? = null
-    var sleepAlarmMinute:Int? = null
+    var sleepAlarmHour: Int? = null
+    var sleepAlarmMinute: Int? = null
     var isSleepAlarmOn = false
 
     lateinit var odsayService: ODsayService
     lateinit var jsonObject: JSONObject
 
-    val tmapKey : String = "l7xx6856c73aa91c41e480afc960d336d8c3"
+    val tmapKey: String = "l7xx6856c73aa91c41e480afc960d336d8c3"
 
     companion object {
         const val BASE_URL = "https://dapi.kakao.com/"
@@ -110,7 +110,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             startMinute = cal.get(Calendar.MINUTE)
             finishHour = startHour + 1
             finishMinute = startMinute
-            if(finishHour>=24){
+            if (finishHour >= 24) {
                 finishHour = 23
                 finishMinute = 59
             }
@@ -140,7 +140,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 }
                 R.id.car -> {
                     transportType = 1
-                    setCarTime()
+                    // setCarTime()
                 }
                 R.id.walk -> {
                     transportType = 2
@@ -170,7 +170,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 else -> 0
             }
             // 2. 출발 알람이 켜져있으면 알람이 울릴 시간 계산
-            if(isAlarmOn){
+            if (isAlarmOn) {
                 calculateAlarmClock(totalTime!!)
             }
             // 3. 일정내용이 비어있지 않으면 scheduleInfo를 MainActivity로 넘김
@@ -221,7 +221,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
             startMinute = minute
             finishHour = hour + 1
             finishMinute = minute
-            if(finishHour>=24){
+            if (finishHour >= 24) {
                 finishHour = 23
                 finishMinute = 59
             }
@@ -277,8 +277,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     private fun setPublicTime(): Unit {
         val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
 
-        val depX = userInfo.getFloat("userLongitude",0.0f)
-        val depY = userInfo.getFloat("userLatitude",0.0f)
+        val depX = userInfo.getFloat("userLongitude", 0.0f)
+        val depY = userInfo.getFloat("userLatitude", 0.0f)
 
         odsayService = ODsayService.init(
             this,
@@ -320,111 +320,101 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     }
 
     private fun setWalkTime(): Unit {
-//        println("얘도 괜찮?")
-//
-//        val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
-//
-//        val depX = userInfo.getFloat("userLongitude", 0.0f)
-//        val depY = userInfo.getFloat("userLatitude", 0.0f)
-//
-//        val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
-//
-//        var url = "https://apis.openapi.sk.com/tmap/routes/pedestrian?"
-//        val client = OkHttpClient()
-//
-//        url += "startX=" + depX
-//        url += "&startY=" + depY
-//        url += "&endX=" + destLongitude.toString()
-//        url += "&endY=" + destLatitude.toString()
-//        url += "&reqCoordType=WGS84GEO"
-//        url += "&startName=" + URLEncoder.encode("출발", "UTF-8")
-//        url += "&endName=" + URLEncoder.encode("도착", "UTF-8")
-//        url += "&searchOption=0&resCoordType=WGS84GEO"
-//
-//        val request = Request.Builder()
-//            .header("Accept", "application/json")
-//            .addHeader("appKey", tmapKey)
-//            .addHeader("Content-Type", "application/json; charset=UTF-8")
-//            .url(url)
-//            .build()
-//
-//        val response = client.newCall(request).execute()
-//        val data = response.body?.string()
-//
-//        val jsonObj = JSONObject(data)
-//        val featureArray = jsonObj.getJSONArray("features")
-//        val firstFeature = featureArray.getJSONObject(0)
-//        val property = firstFeature.getJSONObject("properties")
-//        val walkTime = (property.getInt("totalTime") / 60) + 1
-//
-//        totalTime = walkTime
-//
-//        expectedtime1 = findViewById(R.id.expectedtime1)
-//        expectedtime1.setText(totalTime.toString() + "분")
+        val BASE_URL_TMAP_API = tmapKey
+        val API_KEY = "l7xx6856c73aa91c41e480afc960d336d8c3"
 
-        /*
-        val response = client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
+        val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
+
+        val startX = userInfo.getFloat("userLongitude", 0.0f)
+        val startY = userInfo.getFloat("userLatitude", 0.0f)
+
+        var endX: String = destLongitude.toString()
+        var endY: String = destLatitude.toString()
+        var reqCoordType: String = "WGS84GEO"
+        var startName: String = URLEncoder.encode("출발", "UTF-8")
+        var endName: String = URLEncoder.encode("도착", "UTF-8")
+        var searchOption: String = "0"
+        var resCoordType = "WGS84GEO"
+
+        val api = TmapAPI.create()
+        val callGetSearchWalkRoute = api.getSearchWalkRoute(
+            "application/json",
+            tmapKey,
+            "application/json; charset=UTF-8",
+            startY.toString(),
+            startX.toString(),
+            endX,
+            endY,
+            reqCoordType,
+            startName,
+            endName,
+            searchOption,
+            resCoordType
+        )
+
+        var data: String
+        var tmp: Int = 0
+        var myHandler = Handler()
+
+        callGetSearchWalkRoute.enqueue(object : Callback<ResultWalkRouteSearch> {
+            override fun onResponse(
+                call: Call<ResultWalkRouteSearch>,
+                response: Response<ResultWalkRouteSearch>
+            ) {
+                Log.d("결과", "성공 : ${response.raw()}")
+                Log.d("결과", "성공 : ${response.body()}")
+                tmp = response.body()!!.features[0].properties.totalTime
+
+                totalTime = (tmp / 60) + 1
+
+                myHandler.post {
+                    expectedtime1 = findViewById(R.id.expectedtime1)
+                    expectedtime1.setText(totalTime.toString() + "분")
+                }
             }
-            override fun onResponse(call: Call, response: Response) {
-                val data = response.body?.string()
 
-                val jsonObj = JSONObject(data)
-                val featureArray = jsonObj.getJSONArray("features")
-                val firstFeature = featureArray.getJSONObject(0)
-                val property = firstFeature.getJSONObject("properties")
-                val walkTime = (property.getInt("totalTime") / 60) + 1
-
-                totalTime = walkTime
-
-                expectedtime1 = findViewById(R.id.expectedtime1)
-                expectedtime1.setText(totalTime.toString() + "분")
+            override fun onFailure(call: Call<ResultWalkRouteSearch>, t: Throwable) {
+                Log.d("결과", "실패 : ${t.message}")
             }
         })
-
-         */
-        expectedtime1 = findViewById(R.id.expectedtime1)
-        expectedtime1.setText(totalTime.toString() + "분")
-        totalTime = 7
-
-
     }
 
     //자동차 예상 소요 시간을 초 단위로 계산후 반환
-    private fun setCarTime(): Int{
+    private fun setCarTime(): Int {
         val BASE_URL_KAKAONAVI_API = "https://apis-navi.kakaomobility.com"
         val API_KEY = "KakaoAK 28f1a9b662dea4d3296bfaa59f4590b3"
 
         val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
 
-        val userLatitude = userInfo.getString("userLatitude","")           //출발지 위도
-        val userLongitude = userInfo.getString("userLongitude","")         //출발지 경도
+        val userLatitude = userInfo.getString("userLatitude", "")           //출발지 위도
+        val userLongitude = userInfo.getString("userLongitude", "")         //출발지 경도
 
-        var origin : String = (userLongitude+","+userLatitude)  //출발지 좌표
-        var destination : String = (destLongitude.toString()+","+destLatitude.toString()) //목적지 좌표
+        var origin: String = (userLongitude + "," + userLatitude)  //출발지 좌표
+        var destination: String =
+            (destLongitude.toString() + "," + destLatitude.toString()) //목적지 좌표
 
         val api = kakaonaviAPI.create()
-        val callGetSearchCarRoute = api.getSearchCarRoute(CarRoute.API_KEY,origin,destination)
+        val callGetSearchCarRoute = api.getSearchCarRoute(CarRoute.API_KEY, origin, destination)
 
-        var text:String
-        var tmp:Int = 0
+        var text: String
+        var tmp: Int = 0
 
         callGetSearchCarRoute.enqueue(object : Callback<ResultCarRouteSearch> {
             override fun onResponse(
                 call: Call<ResultCarRouteSearch>,
                 response: Response<ResultCarRouteSearch>
             ) {
-                Log.d("결과","성공 : ${response.raw()}")
-                Log.d("결과","성공 : ${response.body()}")
+                Log.d("결과", "성공 : ${response.raw()}")
+                Log.d("결과", "성공 : ${response.body()}")
                 tmp = response.body()!!.routes[0].summary.duration
                 text = expectedtimetoString(tmp)
 
                 expectedtime1 = findViewById(R.id.expectedtime1)
                 expectedtime1.setText(text)
             }
+
             override fun onFailure(call: Call<ResultCarRouteSearch>, t: Throwable) {
-                Log.d("결과","실패 : ${t.message}")
+                Log.d("결과", "실패 : ${t.message}")
             }
         })
 
@@ -432,8 +422,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     }
 
     //Int형의 초 단위 에상 소요 시간을 포맷에 맞춰 계산
-    fun expectedtimetoString(intseconds:Int): String {
-        val seconds : Long = intseconds.toLong()
+    fun expectedtimetoString(intseconds: Int): String {
+        val seconds: Long = intseconds.toLong()
         val day = TimeUnit.SECONDS.toDays(seconds).toInt()
         val hours = TimeUnit.SECONDS.toHours(seconds) - day * 24
         val minute = TimeUnit.SECONDS.toMinutes(seconds) - TimeUnit.SECONDS.toHours(seconds) * 60
@@ -459,10 +449,10 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         }
     }
 
-    private fun calculateAlarmClock(elapsedTime:Int){
+    private fun calculateAlarmClock(elapsedTime: Int) {
         //알람 시간(나갈 준비를 해야 하는 시간)을 계산: 일정 시작 시간 - 이동 소요 시간 - 외출 준비 시간
         //elapsedTime ; 출발 ~ 도착지 소요시간(단위 : 분)
-        Log.d("소요시간","${elapsedTime}분")
+        Log.d("소요시간", "${elapsedTime}분")
         // 사용자 정보 불러오기
         val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
         val readyTime = userInfo.getInt("readyTime", 0) //외출준비시간(단위: 시간)
@@ -475,19 +465,19 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         // 알람 시간 계산
         alarmMinute = startMinute - elapsedTime_minute
         alarmHour = startHour - elapsedTime_hour - readyTime
-        if(alarmMinute<0){
+        if (alarmMinute < 0) {
             alarmMinute += 60
             alarmHour -= 1
         }
 
         // 외출준비 알람이 울리는 시간 - 수면시간이 선택한 날의 이전일 경우 취침 알람을 킴
         // 예시: 12월 3일에 외출준비 시간 알람이 7시에 울려야 하고, 수면 시간이 8시간일 때, 12월 2일 23시에 취침 시간을 알려줌
-            if(alarmHour - sleepTime < 0){
-                // 취침 알람 시간 계산
-                sleepAlarmHour = alarmHour - sleepTime + 24
-                sleepAlarmMinute = alarmMinute
-                Log.d("취침 알람","${sleepAlarmHour}:${sleepAlarmMinute}")
-                isSleepAlarmOn = true
-            }
+        if (alarmHour - sleepTime < 0) {
+            // 취침 알람 시간 계산
+            sleepAlarmHour = alarmHour - sleepTime + 24
+            sleepAlarmMinute = alarmMinute
+            Log.d("취침 알람", "${sleepAlarmHour}:${sleepAlarmMinute}")
+            isSleepAlarmOn = true
+        }
     }
 }

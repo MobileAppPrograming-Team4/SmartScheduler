@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/route"
-        android:title="대중교통 경로"/>
+        android:title="가는 길"/>
     <item android:id="@+id/carroute"
         android:title="내비게이션"/>
     <item android:id="@+id/modify"
