@@ -277,8 +277,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     private fun setPublicTime(): Unit {
         val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
 
-        val depX = userInfo.getString("userLongitude","")
-        val depY = userInfo.getString("userLatitude","")
+        val depX = userInfo.getFloat("userLongitude",0.0f)
+        val depY = userInfo.getFloat("userLatitude",0.0f)
 
         odsayService = ODsayService.init(
             this,
@@ -288,8 +288,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         odsayService.setReadTimeout(5000)
 
         odsayService.requestSearchPubTransPath(
-            depX.toString(),
             depY.toString(),
+            depX.toString(),
             destLongitude.toString(),
             destLatitude.toString(),
             null,
@@ -324,8 +324,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
         val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
 
-        val depX = userInfo.getString("userLongitude","")
-        val depY = userInfo.getString("userLatitude","")
+        val depX = userInfo.getFloat("userLongitude", 0.0f)
+        val depY = userInfo.getFloat("userLatitude", 0.0f)
 
         val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
 

@@ -59,7 +59,7 @@ class WalkRouteActivity : AppCompatActivity() {
         var walkDep = TMapPoint(depY!!.toDouble(), depX!!.toDouble())
         var walkArrival = TMapPoint(arriY, arriX)
 
-        tmapView.setCenterPoint(depX!!.toDouble(), depY!!.toDouble) // 지도 중심점 출발지로 변경
+        tmapView.setCenterPoint(depX!!.toDouble(), depY!!.toDouble()) // 지도 중심점 출발지로 변경
 
         // OKhttp 초기화
         val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()

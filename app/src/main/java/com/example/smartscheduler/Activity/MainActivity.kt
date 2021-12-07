@@ -361,6 +361,8 @@ class MainActivity : AppCompatActivity() {
         // 이동수단에 따라 각각에 맞는 경로 안내 Activity로 이동
         if (scheduleInfo!!.transportation == 0) { // 대중교통
             val intent = Intent(this, PublicRouteActivity::class.java)
+//            println(scheduleInfo!!.schedulePlace_x_double)
+            Log.d("input 확인 ", "schedulePlace : ${scheduleInfo.schedulePlace_x_double}")
             intent.putExtra("x",scheduleInfo!!.schedulePlace_x_double)
             intent.putExtra("y",scheduleInfo!!.schedulePlace_y_double)
             startActivity(intent)

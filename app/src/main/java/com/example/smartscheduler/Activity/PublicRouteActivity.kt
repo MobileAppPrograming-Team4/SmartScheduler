@@ -44,8 +44,8 @@ class PublicRouteActivity : AppCompatActivity() {
         val arriY = getIntent.getDoubleExtra("y", 0.0)
 
         val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
-        val depX = userInfo.getString("userLongitude", "")
-        val depY = userInfo.getString("userLatitude", "")
+        val depX = userInfo.getFloat("userLatitude", 0.0f)
+        val depY = userInfo.getFloat("userLongitude", 0.0f)
 
         val listView = findViewById<ListView>(R.id.publicRouteListView)
 
