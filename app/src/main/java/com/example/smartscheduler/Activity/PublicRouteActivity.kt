@@ -56,6 +56,8 @@ class PublicRouteActivity : AppCompatActivity() {
         // map = findViewById(R.id.publicRouteKakaoMapView)
         // map.addView(mapView)
 
+
+        // ODSay 초기화
         odsayService = ODsayService.init(
             this@PublicRouteActivity,
             BuildConfig.ODsay_API_KEY
@@ -63,6 +65,7 @@ class PublicRouteActivity : AppCompatActivity() {
         odsayService.setConnectionTimeout(5000)
         odsayService.setReadTimeout(5000)
 
+        // 대중교통 길찾기 함수 호출
         odsayService.requestSearchPubTransPath(
             depX.toString(),
             depY.toString(),
@@ -92,6 +95,7 @@ class PublicRouteActivity : AppCompatActivity() {
                     val subPathInfo = firstPath.getJSONArray("subPath")
                     val transferCount = subPathInfo.length()
 
+                    // 이동 정류장 출력
                     for (i in 0 until transferCount) {
                         var laneStr = ""
                         var stationStr = ""

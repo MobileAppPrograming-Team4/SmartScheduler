@@ -360,13 +360,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun goToRoute(scheduleInfo: ScheduleInfo?, year: Int?, month: Int?, date: Int?) {
-        if (scheduleInfo!!.transportation == 0) {
+        // 이동수단에 따라 각각에 맞는 경로 안내 Activity로 이동
+        if (scheduleInfo!!.transportation == 0) { // 대중교통
             val intent = Intent(this, PublicRouteActivity::class.java)
             intent.putExtra("x",scheduleInfo!!.schedulePlace_x_double)
             intent.putExtra("y",scheduleInfo!!.schedulePlace_y_double)
             startActivity(intent)
         }
-        else if (scheduleInfo!!.transportation == 2) {
+        else if (scheduleInfo!!.transportation == 1) { // 자동차
+            val intent = Intent(this, CarRoute::class.java)
+            intent.putExtra("x",scheduleInfo!!.schedulePlace_x_double)
+            intent.putExtra("y",scheduleInfo!!.schedulePlace_y_double)
+            startActivity(intent)
+        }
+        else if (scheduleInfo!!.transportation == 2) { // 도보
             val intent = Intent(this, WalkRouteActivity::class.java)
             intent.putExtra("x",scheduleInfo!!.schedulePlace_x_double)
             intent.putExtra("y",scheduleInfo!!.schedulePlace_y_double)

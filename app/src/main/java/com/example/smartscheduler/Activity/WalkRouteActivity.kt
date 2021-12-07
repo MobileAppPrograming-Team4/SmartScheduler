@@ -45,6 +45,7 @@ class WalkRouteActivity : AppCompatActivity() {
         totalTime = findViewById<TextView>(R.id.walkTime)
         totalDistance = findViewById<TextView>(R.id.walkLength)
 
+        // Tmap 지도 생성 및 초기화
         var linearLayoutTmap = findViewById<LinearLayout>(R.id.walkTmapView)
         tmapView = TMapView(this)
         linearLayoutTmap.addView(tmapView)
@@ -58,8 +59,9 @@ class WalkRouteActivity : AppCompatActivity() {
         var walkDep = TMapPoint(depY!!.toDouble(), depX!!.toDouble())
         var walkArrival = TMapPoint(arriY, arriX)
 
-        tmapView.setCenterPoint(128.61027824041773, 35.88902720456651);
+        tmapView.setCenterPoint(depX!!.toDouble(), depY!!.toDouble) // 지도 중심점 출발지로 변경
 
+        // OKhttp 초기화
         val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
 
         var url = "https://apis.openapi.sk.com/tmap/routes/pedestrian?"
@@ -74,6 +76,7 @@ class WalkRouteActivity : AppCompatActivity() {
         url += "&endName=" + URLEncoder.encode("끝", "UTF-8")
         url += "&searchOption=0&resCoordType=WGS84GEO"
 
+        // OKhttp를 이용해 Tmap Rest API 요청
         val request = Request.Builder()
             .header("Accept", "application/json")
             .addHeader("appKey", tmapKey)
@@ -81,13 +84,13 @@ class WalkRouteActivity : AppCompatActivity() {
             .url(url)
             .build()
 
-        var myHandler = Handler()
+        var myHandler = Handler() // Handler 생성
 
         val response = client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
+            override fun onFailure(call: Call, e: IOException) { // Rest API 호출 실패
                 e.printStackTrace()
             }
-            override fun onResponse(call: Call, response: Response) {
+            override fun onResponse(call: Call, response: Response) { // Rest API 호출 성공
                 Thread {
                     val data = response.body?.string()
 
@@ -98,6 +101,7 @@ class WalkRouteActivity : AppCompatActivity() {
                     val walkTime = (property.getInt("totalTime") / 60) + 1
                     val walkDistance = property.getInt("totalDistance")
 
+                    // Thread 내부에서 UI를 바꿔 주기 위한 Handler
                     myHandler.post {
                         totalTime.setText(walkTime.toString() + "분")
                         totalDistance.setText(walkDistance.toString() + "m")
@@ -106,6 +110,7 @@ class WalkRouteActivity : AppCompatActivity() {
             }
         })
 
+        // Tmap 지도에 경로 Polyline 띄우기
         TMapData().findPathDataWithType(
             TMapData.TMapPathType.PEDESTRIAN_PATH, walkDep, walkArrival,
             TMapData.FindPathDataListenerCallback { polyLine ->
