@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,8 +40,8 @@ class WalkRouteActivity : AppCompatActivity() {
         val arriY = getIntent.getDoubleExtra("y", 0.0)
 
         val userInfo: SharedPreferences = getSharedPreferences("userInfo", Activity.MODE_PRIVATE)
-        val depX = userInfo.getString("userLongitude", "")
-        val depY = userInfo.getString("userLatitude", "")
+        val depX = userInfo.getFloat("userLongitude", 0.0f)
+        val depY = userInfo.getFloat("userLatitude", 0.0f)
 
         totalTime = findViewById<TextView>(R.id.walkTime)
         totalDistance = findViewById<TextView>(R.id.walkLength)
@@ -84,6 +85,7 @@ class WalkRouteActivity : AppCompatActivity() {
             .url(url)
             .build()
 
+        Log.d("url 확인 ", "url : $url")
         var myHandler = Handler() // Handler 생성
 
         val response = client.newCall(request).enqueue(object : Callback {
@@ -109,6 +111,8 @@ class WalkRouteActivity : AppCompatActivity() {
                 }.start()
             }
         })
+
+
 
         // Tmap 지도에 경로 Polyline 띄우기
         TMapData().findPathDataWithType(
