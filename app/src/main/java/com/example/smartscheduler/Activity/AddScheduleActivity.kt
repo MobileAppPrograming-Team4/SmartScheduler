@@ -168,7 +168,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                 1 -> totalTime = 10
                 2 -> setWalkTime()
                 else -> 0
-            }*/
+            }
             // 2. 출발 알람이 켜져있으면 알람이 울릴 시간 계산
             if (isAlarmOn) {
                 calculateAlarmClock(totalTime!!)
