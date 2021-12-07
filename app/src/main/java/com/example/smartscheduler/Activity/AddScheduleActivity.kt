@@ -186,8 +186,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                     finishMinute,
                     null, //수정 금지(int형)
                     null, //수정 금지(int형)
-                    null, //좌표 입력(double)
-                    null, //좌표 입력(double)
+                    destLatitude, //좌표 입력(double)
+                    destLongitude, //좌표 입력(double)
                     transportType,
                     totalTime,
                     alarmHour,
