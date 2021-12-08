@@ -54,6 +54,8 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     var sleepAlarmHour: Int? = null
     var sleepAlarmMinute: Int? = null
     var isSleepAlarmOn = false
+    var transportType: Int? = null
+    var isAlarmOn: Boolean = false
 
     lateinit var odsayService: ODsayService
     lateinit var jsonObject: JSONObject
@@ -106,7 +108,6 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         val scheduleExplain = findViewById<EditText>(R.id.scheduleExplain)
         scheduleTime()
         /* transportType */
-        var transportType: Int? = null
         transportGroup = findViewById(R.id.transportGroup)
         transportGroup.setOnCheckedChangeListener { radioGroup, checkedId ->
             when (checkedId) {
@@ -132,9 +133,9 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         }
 
         /* place Information */
-        var isAlarmOn: Boolean = true
+
         val setAlarmSwitch = findViewById<Switch>(R.id.setAlarm)
-        setAlarmSwitch.isChecked = true
+        setAlarmSwitch.isChecked = isAlarmOn
         setAlarmSwitch.setOnCheckedChangeListener { compoundButton, isChecked ->
             isAlarmOn = isChecked
         }
@@ -147,7 +148,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                     0 -> setPublicTime()
                     1 -> setCarTime()
                     2 -> setWalkTime()
-                    else -> 0
+                    else -> totalTime = 0
                 }
                 // 2. 출발 알람이 켜져있으면 알람이 울릴 시간 계산
                 if (isAlarmOn) {
@@ -248,6 +249,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
     }
 
     private fun setInfo(scheduleInfo: ScheduleInfo) {
+        // 편집 눌렀을 때 기존 정보 불러오기
         findViewById<TextView>(R.id.scheduleExplain).text = scheduleInfo.scheduleExplain
         year = scheduleInfo.scheduleStartYear
         month = scheduleInfo.scheduleStartMonth
@@ -256,7 +258,35 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         startMinute = scheduleInfo.scheduleStartMinute
         finishHour = scheduleInfo.scheduleFinishHour
         finishMinute = scheduleInfo.scheduleFinishMinute
-        scheduleInfo.transportation = null
+        when(scheduleInfo.transportation){
+            //교통편  0: 대중교통, 1: 자동차, 2: 도보
+            0 -> {
+                transportType = scheduleInfo.transportation
+                findViewById<RadioButton>(R.id.publicTransport).isChecked = true
+            }
+            1 -> {
+                findViewById<RadioButton>(R.id.car).isChecked = true
+                transportType = scheduleInfo.transportation
+            }
+            2 -> {
+                findViewById<RadioButton>(R.id.walk).isChecked = true
+                transportType = scheduleInfo.transportation
+            }
+        }
+        // 장소
+        if(scheduleInfo.schedulePlace_name != null) {
+            destName = scheduleInfo.schedulePlace_name
+            findViewById<TextView>(R.id.locationText).text = destName //장소 이름
+            destLongitude = scheduleInfo.schedulePlace_x_double // 좌표
+            destLatitude = scheduleInfo.schedulePlace_y_double  // 좌표
+        }
+        // 소요시간
+        if(scheduleInfo.elapsedTime != null){
+            totalTime = scheduleInfo.elapsedTime //단위: 분
+            findViewById<TextView>(R.id.expectedtimeTextView).text = expectedtimetoString(totalTime!! * 60)
+        }
+        // 알람 on/off
+        isAlarmOn = scheduleInfo.setAlarm
     }
 
     private fun setPublicTime(): Unit {
