@@ -483,9 +483,9 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
 
         // 외출준비 알람이 울리는 시간 - 수면시간이 선택한 날의 이전일 경우 취침 알람을 킴
         // 예시: 12월 3일에 외출준비 시간 알람이 7시에 울려야 하고, 수면 시간이 8시간일 때, 12월 2일 23시에 취침 시간을 알려줌
-        if (alarmHour - sleepTime < 0) {
+        if (alarmHour - sleepTime < 5) {
             // 취침 알람 시간 계산
-            sleepAlarmHour = alarmHour - sleepTime + 24
+            sleepAlarmHour = alarmHour - sleepTime
             sleepAlarmMinute = alarmMinute
             Log.d("취침 알람", "${sleepAlarmHour}:${sleepAlarmMinute}")
             isSleepAlarmOn = true
