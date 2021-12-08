@@ -76,4 +76,10 @@ class ScheduleViewModel(application: Application) : AndroidViewModel(application
             _tomorrowAlarmData.postValue(tmp)
         }
     }
+
+    fun getTommorowSleepAlarm(year: Int, month: Int, date: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val tmp = repository.getTomorrowSleepAlarm(year, month, date)
+        }
+    }
 }
