@@ -143,18 +143,11 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
         findViewById<Button>(R.id.saveButton).setOnClickListener {
             try {
                 // 저장하기 버튼을 누르면
-                // 1. 소요시간 계산
-                when (transportType) {
-                    0 -> setPublicTime()
-                    1 -> setCarTime()
-                    2 -> setWalkTime()
-                    else -> totalTime = 0
-                }
-                // 2. 출발 알람이 켜져있으면 알람이 울릴 시간 계산
+                // 1. 출발 알람이 켜져있으면 알람이 울릴 시간 계산
                 if (isAlarmOn) {
                     calculateAlarmClock(totalTime!!)
                 }
-                // 3. 일정내용이 비어있지 않으면 scheduleInfo를 MainActivity로 넘김
+                // 2. 일정내용이 비어있지 않으면 scheduleInfo를 MainActivity로 넘김
                 if (scheduleExplain.text.toString().isNotEmpty()) {
                     val scheduleInfo = ScheduleInfo(
                         sId,
@@ -187,7 +180,7 @@ class AddScheduleActivity : AppCompatActivity(), BottomSetScheduleFragment.Compl
                     val intent = Intent()
                     intent.putExtra("scheduleInfo", scheduleInfo)
                     setResult(Activity.RESULT_OK, intent)
-                    // 4. AddScheduleActivity 종료
+                    // 3. AddScheduleActivity 종료
                     finish()
                 } else {
                     Toast.makeText(this, "일정 내용을 입력해주세요", Toast.LENGTH_LONG).show()
