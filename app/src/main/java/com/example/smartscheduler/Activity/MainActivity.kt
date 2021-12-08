@@ -93,18 +93,16 @@ class MainActivity : AppCompatActivity() {
             adapter.setData(it)
         })
         scheduleViewModel.monthData.observe(this, Observer{
-            if (it.isNotEmpty()){
-                scheduleMonth.clear()
-                for ( i in it.indices){
-                    val dotYear = it[i].scheduleStartYear
-                    val dotMonth = it[i].scheduleStartMonth - 1
-                    val dotDate = it[i].scheduleStartDay
-                    val date = Calendar.getInstance()
-                    date.set(dotYear, dotMonth, dotDate)
-                    scheduleMonth.add(CalendarDay.from(date))
-                }
-            calendarView.addDecorator(EventDecorator(parseColor("#c88719"), scheduleMonth))
+            scheduleMonth.clear()
+            for ( i in it.indices){
+                val dotYear = it[i].scheduleStartYear
+                val dotMonth = it[i].scheduleStartMonth - 1
+                val dotDate = it[i].scheduleStartDay
+                val date = Calendar.getInstance()
+                date.set(dotYear, dotMonth, dotDate)
+                scheduleMonth.add(CalendarDay.from(date))
             }
+            calendarView.addDecorator(EventDecorator(parseColor("#c88719"), scheduleMonth))
         })
 
         /* setting button 클릭 */
