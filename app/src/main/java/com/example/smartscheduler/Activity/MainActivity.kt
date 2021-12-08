@@ -326,6 +326,9 @@ class MainActivity : AppCompatActivity() {
             scheduleViewModel.getAllDate(selectedYear!!, selectedMonth!!, selectedDate!!)
             scheduleViewModel.getAllMonth(selectedYear!!, selectedMonth!!)
             getAlarm()
+            if(scheduleList.value?.get(position)!!.setAlarm) { //알람 on인 일정을 삭제할 경우 알람을 취소한다
+                cancelAlarmOrNot(scheduleList.value?.get(position)!!)
+            }
         }
         override fun modify(position: Int) {
             scheduleList = scheduleViewModel.currentData
@@ -405,8 +408,36 @@ class MainActivity : AppCompatActivity() {
                     selectedDate = modifySchedule.scheduleStartDay
                     scheduleViewModel.getAllDate(selectedYear!!, selectedMonth!!, selectedDate!!)
                     getAlarm()
+                    if(!modifySchedule.setAlarm){ //수정한 일정의 알람이 off 상태이면, on->off거나 off->off임
+                        cancelAlarmOrNot(modifySchedule)
+                    }
                 }
             }
+        }
+    }
+
+    private fun cancelAlarmOrNot(alarm:ScheduleInfo){
+        /* 알람 on에서 off로 수정했거나, 알람 on인 일정을 삭제할 경우 알람을 취소한다 */
+        val alarmManager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        val intent = Intent(this, AlarmReceiver::class.java)
+        val sender = PendingIntent.getBroadcast(this, alarm.sId, intent, PendingIntent.FLAG_NO_CREATE)
+        if(sender == null){
+            // 외출 준비 알람이 설정되어 있지 않음
+        }else{
+            // 이미 설정된 알람이 있는 경우 알람을 취소한다
+            alarmManager.cancel(sender)
+            sender.cancel()
+        }
+
+        val intent2 = Intent(this, SleepAlarmReceiver::class.java)
+        val sender2 = PendingIntent.getBroadcast(this, alarm.sId, intent2, PendingIntent.FLAG_NO_CREATE)
+        if(sender2 == null){
+            // 취침 알람이 설정되어 있지 않음
+        }else{
+            // 이미 설정된 알람이 있는 경우 알람을 취소한다
+            alarmManager.cancel(sender2)
+            sender.cancel()
         }
     }
 }
