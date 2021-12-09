@@ -27,8 +27,8 @@ Install Android Studio, if you don't already have it
 <img src="https://user-images.githubusercontent.com/68316096/145347478-db64111c-e55d-481a-9908-38cd88f584ff.jpg" width="15%" height="15%"/>
 </p>
 <p>
-<img src="https://user-images.githubusercontent.com/68316096/145347621-a0b45f89-ee3c-4932-b9ad-ed23601a1614.jpg" width="15%" height="15%"/>
-<img src="https://user-images.githubusercontent.com/68316096/145347635-80ed42d1-64f4-4300-9828-5686abbc87b5.jpg" width="15%" height="15%"/>
+<img src="https://user-images.githubusercontent.com/68316096/145449866-35b73d2b-e463-4dc9-9825-2d3b34e462f1.jpg" width="15%" height="15%"/>
+<img src="https://user-images.githubusercontent.com/68316096/145449918-9ec74026-9ef2-489d-9c3e-75bf13fdf20e.jpg" width="15%" height="15%"/>
 <img src="https://user-images.githubusercontent.com/68316096/145347906-d7a854d2-50ff-4d71-b59f-ba2211b30e76.jpg" width="15%" height="15%"/>
 <img src="https://user-images.githubusercontent.com/68316096/145347925-6adf12aa-831e-4934-894f-985bd28863c7.jpg" width="15%" height="15%"/>
 <img src="https://user-images.githubusercontent.com/68316096/145347916-a8e506bf-864c-426d-8156-86f681dabadb.jpg" width="15%" height="15%"/>
@@ -47,4 +47,4 @@ Install Android Studio, if you don't already have it
 </p>  
 
 ## Video :clapper:
-[데모 영상 보러가기]()
+[데모 영상 보러가기](https://www.youtube.com/watch?v=eHq2R9ktpzU&feature=youtu.be)
