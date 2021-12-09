@@ -223,19 +223,14 @@ class StartpointSearchActivity : AppCompatActivity(), MapView.CurrentLocationEve
 
         // 중심점 변경
         mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude), true)
-
         // 줌 레벨 변경
         mapView.setZoomLevel(4, true)
-
         // 중심점 변경 + 줌 레벨 변경
         //mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(latitude, longitude), 9, true);
-
         // 줌 인
         mapView.zoomIn(true)
-
         // 줌 아웃
         //mapView.zoomOut(true);
-
         // 마커 생성
         setDaumMapCurrentMarker(mapView)
     }
